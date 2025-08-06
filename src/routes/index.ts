@@ -1,9 +1,8 @@
-import { Router, Response } from 'express'
+import { Router } from 'express'
 
+import authRouter from '../components/auth/auth.routes'
 const router = Router()
 
-router.get('/', (_, res: Response) => {
-  res.send('ok')
-})
+router.use('/auth', authRouter)
 
 export default router

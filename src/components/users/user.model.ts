@@ -1,14 +1,5 @@
 import { InferAttributes, InferCreationAttributes } from 'sequelize'
-import {
-  Model,
-  Table,
-  Column,
-  DataType,
-  PrimaryKey,
-  Unique,
-  AllowNull,
-  Default,
-} from 'sequelize-typescript'
+import { Model, Table, Column, DataType, Unique, AllowNull, Default } from 'sequelize-typescript'
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -16,12 +7,15 @@ export enum UserRole {
   ANALYST = 'analyst',
 }
 
-@Table({ tableName: 'ecommerce_users', timestamps: true })
+@Table({
+  tableName: 'ecommerce_users',
+  timestamps: true,
+  defaultScope: { attributes: { exclude: ['password'] } },
+  scopes: {
+    addPassword: { attributes: { include: ['password'] } },
+  },
+})
 export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  @PrimaryKey
-  @Column(DataType.INTEGER)
-  id!: number
-
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -37,5 +31,5 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
 
   @Default(false)
   @Column(DataType.BOOLEAN)
-  isBlocked!: boolean
+  isBlocked?: boolean
 }

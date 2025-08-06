@@ -11,8 +11,12 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
     error(res, 401, 'Access denied. No token provided.')
   }
 
+  const refreshToken = req.cookies.refreshToken
+  if (!refreshToken) error(res, 401, 'You are not login')
+
   try {
     const decoded = verifyAccessToken(token as string)
+
     ;(req as any).user = decoded
     next()
   } catch {
