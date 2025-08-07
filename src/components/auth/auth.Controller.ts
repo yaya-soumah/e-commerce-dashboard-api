@@ -38,7 +38,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 60 * 60 * 1000, // 7 days
     })
-    success(res, 201, { token: accessToken, user }, 'Register successful')
+    success(res, 200, { token: accessToken, user }, 'Register successful')
   } catch (err) {
     error(res, (err as AppError).statusCode, (err as AppError).message)
   }

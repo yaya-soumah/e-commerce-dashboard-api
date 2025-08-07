@@ -1,6 +1,6 @@
-import { User } from '../../models/index.js'
+import { User } from '../../models/index'
 
-import { RegisterDataType } from './auth.schema.js'
+import { RegisterDataType } from './auth.schema'
 
 export class AuthRepository {
   static async create(data: RegisterDataType) {
