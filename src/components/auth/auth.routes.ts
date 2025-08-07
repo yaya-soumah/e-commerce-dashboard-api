@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import { validate } from '../../middleware/validate.middleware'
 import { authenticateToken } from '../../middleware/auth.middleware'
+import { authorizeRole } from '../../middleware/requireRole.middleware'
 
 import { RegisterSchema, LoginSchema } from './auth.schema'
 import {
@@ -14,7 +15,13 @@ import {
 
 const router = Router()
 
-router.post('/register', validate(RegisterSchema), registerHandler)
+router.post(
+  '/register',
+  authenticateToken,
+  authorizeRole('admin'),
+  validate(RegisterSchema),
+  registerHandler,
+)
 router.post('/login', validate(LoginSchema), loginHandler)
 router.post('/refresh', refreshTokenHandler)
 router.post('/logout', logoutHandler)
