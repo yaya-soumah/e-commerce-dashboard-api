@@ -2,45 +2,31 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('ecommerce_users', {
+    await queryInterface.createTable('ecommerce_role_permissions', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      name: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-      email: {
-        type: Sequelize.STRING,
-        unique: true,
-        allowNull: false,
-      },
-      password: {
-        type: Sequelize.STRING,
-        allowNull: false,
-      },
       roleId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
         references: {
           model: 'ecommerce_roles',
           key: 'id',
         },
-        onDelete: 'RESTRICT',
+        onDelete: 'CASCADE',
         onUpdate: 'CASCADE',
       },
-      status: {
-        type: Sequelize.ENUM('active', 'inactive', 'blocked'),
-        defaultValue: 'active',
+      permissionId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'ecommerce_permissions',
+          key: 'id',
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE',
       },
-      avatar: {
-        type: Sequelize.STRING,
-        allowNull: true,
-      },
-
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,
@@ -52,6 +38,6 @@ module.exports = {
     })
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('ecommerce_users')
+    await queryInterface.dropTable('ecommerce_role_permissions')
   },
 }

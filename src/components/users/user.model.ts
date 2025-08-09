@@ -1,5 +1,16 @@
-import { InferAttributes, InferCreationAttributes } from 'sequelize'
-import { Model, Table, Column, DataType, Unique, AllowNull, Default } from 'sequelize-typescript'
+import {
+  Model,
+  Table,
+  Column,
+  DataType,
+  Unique,
+  AllowNull,
+  ForeignKey,
+  BelongsTo,
+  Default,
+} from 'sequelize-typescript'
+
+import { Role } from '../roles/roles.models'
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -15,7 +26,10 @@ export enum UserRole {
     addPassword: { attributes: { include: ['password'] } },
   },
 })
-export class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
+export class User extends Model {
+  @Column(DataType.STRING)
+  name?: string
+
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
@@ -25,11 +39,18 @@ export class User extends Model<InferAttributes<User>, InferCreationAttributes<U
   @Column(DataType.STRING)
   password!: string
 
-  @Default(UserRole.ANALYST)
-  @Column(DataType.ENUM(...Object.values(UserRole)))
-  role!: string
+  @AllowNull(false)
+  @ForeignKey(() => Role)
+  @Column(DataType.INTEGER)
+  roleId!: number
 
-  @Default(false)
-  @Column(DataType.BOOLEAN)
-  isBlocked?: boolean
+  @Default('active')
+  @Column(DataType.ENUM('active', 'inactive', 'blocked'))
+  status?: string
+
+  @Column(DataType.STRING)
+  avatar?: string
+
+  @BelongsTo(() => Role)
+  role?: Role
 }

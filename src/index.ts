@@ -4,6 +4,7 @@ import { config } from 'dotenv'
 import sequelize, { setupModels } from './config/database.config'
 import logger from './config/logger'
 import app from './app'
+// import { seedDatabase } from './config/seed'
 
 config()
 
@@ -13,6 +14,8 @@ async function startServer() {
   try {
     await sequelize.sync()
     setupModels(sequelize)
+    //seed the database
+    // await seedDatabase()
     logger.info('Database connected successfully')
     app.listen(PORT, () => {
       logger.info(`Server listening on http://localhost:${PORT}/api/v1/`)
