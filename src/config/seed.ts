@@ -53,19 +53,27 @@ const defaultRoles = [
 ]
 
 export const seedDatabase = async () => {
+  const permissions: Permission[] = []
   try {
     for (const perm of defaultPermissions) {
-      await Permission.findOrCreate({
+      const [newPermission] = await Permission.findOrCreate({
         where: { key: perm.key },
         defaults: perm,
       })
+      permissions.push(newPermission)
     }
+
     for (const roleData of defaultRoles) {
       const [role] = await Role.findOrCreate({
         where: { name: roleData.name },
-        defaults: { name: roleData.name },
       })
-      role.$set('permissions', roleData.permissions)
+      roleData.permissions = roleData.permissions.map(
+        (key) => permissions.find((perm) => perm.key === key)?.id,
+      )
+      if (roleData.permissions.length > 0) {
+        role.$set('permissions', roleData.permissions)
+        role.save()
+      }
     }
     const [adminRole] = await Role.findOrCreate({
       where: { name: 'admin' },
@@ -73,6 +81,7 @@ export const seedDatabase = async () => {
     await User.findOrCreate({
       where: { email: 'admin@example.com' },
       defaults: {
+        name: 'Admin User',
         email: 'admin@example.com',
         password: await parse('Password123'),
         roleId: adminRole.id,

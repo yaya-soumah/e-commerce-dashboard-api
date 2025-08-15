@@ -1,9 +1,8 @@
 import { User } from '../../models/index'
-
-import { RegisterDataType } from './auth.schema'
+import { UserCreationAttributes } from '../users/user.model'
 
 export class AuthRepository {
-  static async create(data: RegisterDataType) {
+  static async create(data: UserCreationAttributes) {
     return User.create(data)
   }
 

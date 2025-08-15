@@ -29,7 +29,7 @@ module.exports = {
           model: 'ecommerce_roles',
           key: 'id',
         },
-        onDelete: 'RESTRICT',
+        onDelete: 'NO ACTION',
         onUpdate: 'CASCADE',
       },
       status: {

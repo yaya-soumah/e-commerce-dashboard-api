@@ -8,11 +8,19 @@ import {
   BelongsToMany,
 } from 'sequelize-typescript'
 
-import { Role } from './roles.models'
-import { RolePermission } from './rolePermissions.models'
+import { Role } from '../roles/roles.models'
+import { RolePermission } from '../roles/rolePermissions.models'
+
+interface PermissionAttributes {
+  id: number
+  key: string
+  description: string
+}
+
+type PermissionCreationAttributes = Omit<PermissionAttributes, 'id'>
 
 @Table({ tableName: 'ecommerce_permissions', timestamps: true })
-export class Permission extends Model {
+export class Permission extends Model<PermissionAttributes, PermissionCreationAttributes> {
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)

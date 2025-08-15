@@ -7,11 +7,11 @@ import { AuthService } from './auth.service'
 
 export const registerHandler = async (req: Request, res: Response) => {
   try {
-    const { email, password, role } = req.body
+    const { name, email, password } = req.body
     const { accessToken, refreshToken, user } = await AuthService.register({
       email,
       password,
-      role,
+      name,
     })
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
@@ -38,7 +38,7 @@ export const loginHandler = async (req: Request, res: Response) => {
       secure: process.env.NODE_ENV === 'production',
       maxAge: 7 * 60 * 60 * 1000, // 7 days
     })
-    success(res, 200, { token: accessToken, user }, 'Register successful')
+    success(res, 200, { token: accessToken, user }, 'Login successful')
   } catch (err) {
     error(res, (err as AppError).statusCode, (err as AppError).message)
   }

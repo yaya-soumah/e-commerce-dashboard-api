@@ -2,23 +2,25 @@ import { AppError } from '../../utils/app-error.util'
 import { signRefreshToken, signAccessToken, verifyRefreshToken } from '../../utils/jwt.util'
 import { compare, parse } from '../../utils/bcrypt.util'
 import { UserRole } from '../users/user.model'
+import { RolesRepository } from '../roles/roles.repositories'
 
 import { AuthRepository } from './auth.repository'
-import { RegisterDataType, LoginDataType } from './auth.schema'
 
 export class AuthService {
   private static payload(user: any) {
     return { userId: user.id, email: user.email, role: user.role }
   }
-  static async register(data: RegisterDataType) {
+  static async register(data: { name: string; email: string; password: string }) {
     const isEmailExist = await AuthRepository.getByEmail(data.email)
     if (isEmailExist) throw new AppError('This email already exists', 400)
 
     const hashedPassword = await parse(data.password)
+    const role = await RolesRepository.getOrCreate('staff')
     const user = await AuthRepository.create({
+      name: data.name,
       email: data.email,
       password: hashedPassword,
-      role: data.role,
+      roleId: role.id,
     })
 
     const accessToken = signAccessToken(this.payload(user))
@@ -30,7 +32,7 @@ export class AuthService {
     return { accessToken, refreshToken, user: safeUser }
   }
 
-  static async login(data: LoginDataType) {
+  static async login(data: { email: string; password: string }) {
     const user = await AuthRepository.getByEmail(data.email)
     if (!user) throw new AppError('User not found', 404)
     const match = await compare(data.password, user.password)

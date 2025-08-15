@@ -1,30 +1,26 @@
-import {
-  Model,
-  Column,
-  Table,
-  DataType,
-  PrimaryKey,
-  AllowNull,
-  ForeignKey,
-} from 'sequelize-typescript'
-import { InferAttributes, InferCreationAttributes } from 'sequelize'
+import { Model, Column, Table, DataType, AllowNull, ForeignKey } from 'sequelize-typescript'
+import { Optional } from 'sequelize'
+
+import { Permission } from '../permissions/permissions.models'
 
 import { Role } from './roles.models'
-import { Permission } from './permissions.models'
+
+interface RolePermissionAttributes {
+  id: number
+  roleId: number
+  permissionId: number
+}
+
+type RolePermissionCreationAttributes = Optional<RolePermissionAttributes, 'id'>
 
 @Table({
   tableName: 'ecommerce_role_permissions',
   timestamps: true,
 })
 export class RolePermission extends Model<
-  InferAttributes<RolePermission>,
-  InferCreationAttributes<RolePermission>
+  RolePermissionAttributes,
+  RolePermissionCreationAttributes
 > {
-  @AllowNull(false)
-  @PrimaryKey
-  @Column(DataType.INTEGER)
-  id!: number
-
   @AllowNull(false)
   @ForeignKey(() => Role)
   @Column(DataType.INTEGER)

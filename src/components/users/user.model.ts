@@ -9,6 +9,7 @@ import {
   BelongsTo,
   Default,
 } from 'sequelize-typescript'
+import { Optional } from 'sequelize'
 
 import { Role } from '../roles/roles.models'
 
@@ -18,6 +19,19 @@ export enum UserRole {
   ANALYST = 'analyst',
 }
 
+interface UserAttributes {
+  id: number
+  name: string
+  email: string
+  password: string
+  roleId: number
+  status?: string
+  avatar?: string
+}
+
+type UserCreationAttributes = Optional<UserAttributes, 'id' | 'status' | 'avatar'>
+export type { UserAttributes, UserCreationAttributes }
+
 @Table({
   tableName: 'ecommerce_users',
   timestamps: true,
@@ -26,7 +40,7 @@ export enum UserRole {
     addPassword: { attributes: { include: ['password'] } },
   },
 })
-export class User extends Model {
+export class User extends Model<UserAttributes, UserCreationAttributes> {
   @Column(DataType.STRING)
   name?: string
 
