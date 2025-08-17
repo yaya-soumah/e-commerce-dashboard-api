@@ -6,55 +6,58 @@ import { signAccessToken, signRefreshToken } from '../../../utils/jwt.util'
 import { authFactory } from './auth.factory'
 
 describe('Auth API', () => {
-  let userData: any
-  let token: string
-  let refreshToken: string
-  let sessionCookie: string
+  let adminToken: string
+  let adminRefreshToken: string
+  let adminSessionCookie: string
+  let nonAdminToken: string
 
   beforeAll(async () => {
-    userData = authFactory()
-    let payload = { userId: 1, role: 'admin', email: 'test@example.com' }
-    token = signAccessToken(payload)
-    refreshToken = signRefreshToken(payload)
-    sessionCookie = `refreshToken=${refreshToken}; HttpOnly; Secure=false; SameSite=strict`
+    let adminPayload = { userId: 1, email: 'admin@example.com', role: 'admin' }
+    adminToken = signAccessToken(adminPayload)
+    adminRefreshToken = signRefreshToken(adminPayload)
+    adminSessionCookie = `refreshToken=${adminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
+    // Create a non-admin user for testing
+    let nonAdminPayload = { userId: 2, email: 'nonAdmin@example.com', role: 'staff' }
+    nonAdminToken = signAccessToken(nonAdminPayload)
   })
 
-  describe('Register /auth/register', () => {
+  describe('Post /auth/register', () => {
     it('Admin Should register a new analyst user', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send(userData)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminSessionCookie])
+        .send(authFactory({ name: 'analyst' }))
 
       expect(res.status).toBe(201)
-      expect(res.body.data.user.role).toBe('analyst')
     })
-    it('Admin Should register a new staff user', async () => {
+
+    it('Non admin should not create new user', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send(authFactory({ email: 'test2@example.com', role: 'staff' }))
+        .set('Authorization', `Bearer ${nonAdminToken}`)
+        .set('Cookie', [adminSessionCookie])
+        .send(authFactory({ name: 'staff', email: 'staff@example.com' }))
 
-      expect(res.status).toBe(201)
-      expect(res.body.data.user.role).toBe('staff')
+      expect(res.status).toBe(403)
     })
+
     it('Should throw error with duplicate email', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send(authFactory({ email: 'test@example.com', password: 'Password123' }))
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminSessionCookie])
+        .send(authFactory({ name: 'admin', email: 'admin@example.com', password: 'Password123' }))
 
       expect(res.status).toBe(400)
+      expect(res.body.message).toBe('This email already exists')
     })
 
     it('Should throw error with missing data', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminSessionCookie])
         .send({ password: 'Password123' })
 
       expect(res.status).toBe(400)
@@ -62,51 +65,29 @@ describe('Auth API', () => {
     it('Should throw error with invalid email format', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send({ password: 'Password123', email: 'invalid@email' })
-
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminSessionCookie])
+        .send({ name: 'admin', password: 'Password123', email: 'invalid@email' })
       expect(res.status).toBe(400)
+      expect(res.body.message).toBe('Validation failed')
     })
     it('Should throw error with invalid password format', async () => {
       const res = await request(app)
         .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminSessionCookie])
         .send({ password: 'password123', email: 'test@example.com' })
 
       expect(res.status).toBe(400)
-    })
-
-    it('Should throw error with invalid role value', async () => {
-      const res = await request(app)
-        .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send({ password: 'Password123', email: 'test3@example.com', role: 'invalid' })
-
-      expect(res.status).toBe(400)
-    })
-
-    it('Should throw error with non-admin', async () => {
-      let payload = { userId: 1, role: 'analyst', email: 'test@example.com' }
-      token = signAccessToken(payload)
-      refreshToken = signRefreshToken(payload)
-      const sessionCookie = `refreshToken=${refreshToken}; HttpOnly; Secure=false; SameSite=strict`
-      const res = await request(app)
-        .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${token}`)
-        .set('Cookie', [sessionCookie])
-        .send(userData)
-
-      expect(res.status).toBe(403)
+      expect(res.body.message).toBe('Validation failed')
     })
   })
 
   describe('Login /auth/login', () => {
     it('Should login', async () => {
-      const res = await request(app).post('/api/v1/auth/login').send(userData)
-
+      const res = await request(app)
+        .post('/api/v1/auth/login')
+        .send({ email: 'admin@example.com', password: 'Password123' })
       expect(res.status).toBe(200)
     })
     it('Should throw error with missing credentials', async () => {
@@ -126,9 +107,10 @@ describe('Auth API', () => {
 
   describe('Refresh /auth/refresh', () => {
     it('Should return token', async () => {
-      const res = await request(app).post('/api/v1/auth/refresh').set('Cookie', [sessionCookie])
+      const res = await request(app)
+        .post('/api/v1/auth/refresh')
+        .set('Cookie', [adminSessionCookie])
 
-      console.log('refresh: res.body ', res.body)
       expect(res.status).toBe(200)
     })
     it('Should throw error for missing refreshToken', async () => {
@@ -139,7 +121,7 @@ describe('Auth API', () => {
   })
   describe('Logout /auth/logout', () => {
     it('Should logout', async () => {
-      const res = await request(app).post('/api/v1/auth/logout').set('Cookie', [sessionCookie])
+      const res = await request(app).post('/api/v1/auth/logout').set('Cookie', [adminSessionCookie])
 
       expect(res.status).toBe(200)
     })
@@ -148,9 +130,8 @@ describe('Auth API', () => {
     it('Should get profile', async () => {
       const res = await request(app)
         .get('/api/v1/auth/me')
-        .set('Cookie', [sessionCookie])
-        .set('Authorization', `Bearer ${token}`)
-
+        .set('Cookie', [adminSessionCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
       expect(res.status).toBe(200)
     })
   })

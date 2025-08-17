@@ -16,11 +16,4 @@ export class PermissionsRepository {
   static async create(data: { key: string; description: string }) {
     return await Permission.create(data)
   }
-
-  static async update(id: number, data: { key?: string; description?: string }) {
-    return await Permission.update(data, {
-      where: { id },
-      returning: true,
-    })
-  }
 }

@@ -1,10 +1,12 @@
+import { AppError } from '../../utils/app-error.util'
+
 import { PermissionsRepository } from './permissions.repository'
 
 export class PermissionsService {
   static async getAllPermissions() {
     const permissions = await PermissionsRepository.findAll()
     if (!permissions) {
-      throw new Error('No permissions found')
+      throw new AppError('No permissions found', 404)
     }
     return permissions
   }
@@ -12,7 +14,7 @@ export class PermissionsService {
   static async getPermissionById(id: number) {
     const permission = await PermissionsRepository.findById(id)
     if (!permission) {
-      throw new Error('Permission not found')
+      throw new AppError('Permission not found', 404)
     }
     return permission
   }
@@ -20,7 +22,7 @@ export class PermissionsService {
   static async createPermission(data: { key: string; description: string }) {
     const existing = await PermissionsRepository.findByKey(data.key)
     if (existing) {
-      throw new Error('Permission with this key already exists')
+      throw new AppError('Permission with this key already exists', 400)
     }
     const newPermission = await PermissionsRepository.create(data)
     return newPermission
@@ -29,13 +31,14 @@ export class PermissionsService {
   static async updatePermission(id: number, data: { key?: string; description?: string }) {
     const permission = await PermissionsRepository.findById(id)
     if (!permission) {
-      throw new Error('Permission not found')
+      throw new AppError('Permission not found', 404)
     }
     const existing = await PermissionsRepository.findByKey(data.key || '')
     if (existing && existing.id !== id) {
-      throw new Error('Permission with this key already exists')
+      throw new AppError('Permission with this key already exists', 400)
     }
-    const updatedPermission = await PermissionsRepository.update(id, data)
-    return updatedPermission
+    await permission.update(data)
+    permission.save()
+    return permission
   }
 }

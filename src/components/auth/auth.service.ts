@@ -7,8 +7,8 @@ import { RolesRepository } from '../roles/roles.repositories'
 import { AuthRepository } from './auth.repository'
 
 export class AuthService {
-  private static payload(user: any) {
-    return { userId: user.id, email: user.email, role: user.role }
+  private static payload(user: any, role: any) {
+    return { userId: user.id, email: user.email, roleId: role.name }
   }
   static async register(data: { name: string; email: string; password: string }) {
     const isEmailExist = await AuthRepository.getByEmail(data.email)
@@ -23,8 +23,8 @@ export class AuthService {
       roleId: role.id,
     })
 
-    const accessToken = signAccessToken(this.payload(user))
-    const refreshToken = signRefreshToken(this.payload(user))
+    const accessToken = signAccessToken(this.payload(user, role))
+    const refreshToken = signRefreshToken(this.payload(user, role))
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user.get({ plain: true })
@@ -37,8 +37,9 @@ export class AuthService {
     if (!user) throw new AppError('User not found', 404)
     const match = await compare(data.password, user.password)
     if (!match) throw new AppError('Wrong password', 400)
-    const accessToken = signAccessToken(this.payload(user))
-    const refreshToken = signRefreshToken(this.payload(user))
+    const role = await user.$get('role')
+    const accessToken = signAccessToken(this.payload(user, role))
+    const refreshToken = signRefreshToken(this.payload(user, role))
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { password, ...safeUser } = user.get({ plain: true })
@@ -51,12 +52,12 @@ export class AuthService {
       const decode = verifyRefreshToken(refreshToken) as {
         userId: string
         email: string
-        role: UserRole
+        roleId: UserRole
       }
       const accessToken = signAccessToken({
         userId: decode.userId,
         email: decode.email,
-        role: decode.role,
+        roleId: decode.roleId,
       })
       return { accessToken }
     } catch {
