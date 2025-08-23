@@ -15,6 +15,7 @@ export class AuthService {
     if (isEmailExist) throw new AppError('This email already exists', 400)
 
     const hashedPassword = await parse(data.password)
+
     const role = await RolesRepository.getOrCreate('staff')
     const user = await AuthRepository.create({
       name: data.name,
@@ -26,10 +27,7 @@ export class AuthService {
     const accessToken = signAccessToken(this.payload(user, role))
     const refreshToken = signRefreshToken(this.payload(user, role))
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...safeUser } = user.get({ plain: true })
-
-    return { accessToken, refreshToken, user: safeUser }
+    return { accessToken, refreshToken, user }
   }
 
   static async login(data: { email: string; password: string }) {
@@ -41,10 +39,7 @@ export class AuthService {
     const accessToken = signAccessToken(this.payload(user, role))
     const refreshToken = signRefreshToken(this.payload(user, role))
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password, ...safeUser } = user.get({ plain: true })
-
-    return { accessToken, refreshToken, user: safeUser }
+    return { accessToken, refreshToken, user }
   }
 
   static async refresh(refreshToken: string) {

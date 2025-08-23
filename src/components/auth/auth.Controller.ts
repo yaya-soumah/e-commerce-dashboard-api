@@ -68,6 +68,7 @@ export const logoutHandler = async (req: Request, res: Response) => {
 export const getCurrentUserHandler = async (req: Request, res: Response) => {
   try {
     const { userId } = (req as any).user
+
     const user = await AuthService.getCurrentUser(Number(userId))
     success(res, 200, user, 'Operation successful')
   } catch (err) {

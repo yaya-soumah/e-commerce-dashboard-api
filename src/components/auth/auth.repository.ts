@@ -3,7 +3,11 @@ import { UserCreationAttributes } from '../users/user.model'
 
 export class AuthRepository {
   static async create(data: UserCreationAttributes) {
-    return User.create(data)
+    const result = await User.create(data)
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...user } = result.get({ plain: true })
+    return user
   }
 
   static async getByEmail(email: string) {
