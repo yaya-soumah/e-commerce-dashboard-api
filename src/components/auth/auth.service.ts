@@ -8,7 +8,7 @@ import { AuthRepository } from './auth.repository'
 
 export class AuthService {
   private static payload(user: any, role: any) {
-    return { userId: user.id, email: user.email, roleId: role.name }
+    return { userId: user.id, email: user.email, roleName: role.name }
   }
   static async register(data: { name: string; email: string; password: string }) {
     const isEmailExist = await AuthRepository.getByEmail(data.email)

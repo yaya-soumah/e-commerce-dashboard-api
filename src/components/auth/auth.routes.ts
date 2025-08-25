@@ -5,13 +5,7 @@ import { authenticateToken } from '../../middleware/auth.middleware'
 import { authorizeRole } from '../../middleware/requireRole.middleware'
 
 import { RegisterSchema, LoginSchema } from './auth.schema'
-import {
-  loginHandler,
-  logoutHandler,
-  registerHandler,
-  refreshTokenHandler,
-  getCurrentUserHandler,
-} from './auth.Controller'
+import { AuthController } from './auth.Controller'
 
 const router = Router()
 
@@ -20,11 +14,11 @@ router.post(
   authenticateToken,
   authorizeRole('admin'),
   validate(RegisterSchema),
-  registerHandler,
+  AuthController.registerHandler,
 )
-router.post('/login', validate(LoginSchema), loginHandler)
-router.post('/refresh', refreshTokenHandler)
-router.post('/logout', logoutHandler)
-router.get('/me', authenticateToken, getCurrentUserHandler)
+router.post('/login', validate(LoginSchema), AuthController.loginHandler)
+router.post('/refresh', AuthController.refreshTokenHandler)
+router.post('/logout', AuthController.logoutHandler)
+router.get('/me', authenticateToken, AuthController.getCurrentUserHandler)
 
 export default router

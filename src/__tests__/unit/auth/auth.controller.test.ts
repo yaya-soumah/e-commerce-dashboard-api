@@ -2,13 +2,7 @@ import { Request, Response } from 'express'
 
 import token from '../../utils/token'
 import mockHttp from '../../utils/http'
-import {
-  getCurrentUserHandler,
-  loginHandler,
-  logoutHandler,
-  refreshTokenHandler,
-  registerHandler,
-} from '../../../components/auth/auth.Controller'
+import { AuthController } from '../../../components/auth/auth.Controller'
 import { AuthService } from '../../../components/auth/auth.service'
 
 describe('AuthController', () => {
@@ -28,7 +22,7 @@ describe('AuthController', () => {
     const req = mockHttp.request({ body }) as Request
     const res = mockHttp.response() as unknown as Response
 
-    await registerHandler(req, res)
+    await AuthController.registerHandler(req, res)
 
     expect(registerSpy).toHaveBeenCalledWith(body)
     expect(res.status).toHaveBeenCalledWith(201)
@@ -54,7 +48,7 @@ describe('AuthController', () => {
     const body = { email: 'admin@example.com', password: 'Password123' }
     const req = mockHttp.request({ body }) as Request
     const res = mockHttp.response() as unknown as Response
-    await loginHandler(req, res)
+    await AuthController.loginHandler(req, res)
 
     expect(loginSpy).toHaveBeenCalledWith(body)
     expect(res.status).toHaveBeenCalledWith(200)
@@ -83,7 +77,7 @@ describe('AuthController', () => {
     }) as Request
     const res = mockHttp.response() as unknown as Response
 
-    await refreshTokenHandler(req, res)
+    await AuthController.refreshTokenHandler(req, res)
 
     expect(refreshSpy).toHaveBeenCalled()
     expect(refreshSpy).toHaveBeenCalledWith(refreshToken)
@@ -100,7 +94,7 @@ describe('AuthController', () => {
   it('Should logout', async () => {
     const req = {} as Request
     const res = mockHttp.response() as unknown as Response
-    await logoutHandler(req, res)
+    await AuthController.logoutHandler(req, res)
 
     expect(res.status).toHaveBeenCalledWith(200)
     expect(res.clearCookie).toHaveBeenCalledWith('refreshToken', expect.any(Object))
@@ -112,7 +106,7 @@ describe('AuthController', () => {
     const req = {} as Request
     const res = mockHttp.response() as unknown as Response
     ;(req as any).user = { userId: user.id }
-    await getCurrentUserHandler(req, res)
+    await AuthController.getCurrentUserHandler(req, res)
 
     expect(currentUserSpy).toHaveBeenCalled()
     expect(currentUserSpy).toHaveBeenCalledWith(user.id)

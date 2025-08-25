@@ -27,7 +27,7 @@ describe('Roles API', () => {
       },
     })
 
-    const payload = { userId: adminUser.id, email: adminUser.email, role: adminRole.name }
+    const payload = { userId: adminUser.id, email: adminUser.email, roleName: adminRole.name }
     adminToken = signAccessToken(payload)
     refreshToken = signRefreshToken(payload)
     sessionCookie = `refreshToken=${refreshToken}; HttpOnly; Secure=false; SameSite=strict`

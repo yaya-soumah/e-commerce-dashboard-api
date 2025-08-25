@@ -10,14 +10,13 @@ describe('Auth API', () => {
   let adminRefreshToken: string
   let adminSessionCookie: string
   let nonAdminToken: string
+  let adminPayload = { userId: 1, email: 'admin@example.com', roleName: 'admin' }
+  let nonAdminPayload = { userId: 2, email: 'nonAdmin@example.com', roleName: 'staff' }
 
   beforeAll(async () => {
-    let adminPayload = { userId: 1, email: 'admin@example.com', role: 'admin' }
     adminToken = signAccessToken(adminPayload)
     adminRefreshToken = signRefreshToken(adminPayload)
     adminSessionCookie = `refreshToken=${adminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
-    // Create a non-admin user for testing
-    let nonAdminPayload = { userId: 2, email: 'nonAdmin@example.com', role: 'staff' }
     nonAdminToken = signAccessToken(nonAdminPayload)
   })
 

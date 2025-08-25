@@ -23,6 +23,7 @@ export class RolesService {
 
   static async updateRole(id: number, name?: string, permissions?: string[]) {
     const existingRole = await RolesRepository.getById(id)
+
     if (!existingRole) throw new AppError('Role not found', 404)
     if (name) {
       const roleWithName = await RolesRepository.getByName(name)
@@ -43,6 +44,7 @@ export class RolesService {
   static async deleteRole(id: number) {
     const buildInRoles = ['admin', 'staff', 'analyst']
     const deletedRole = await RolesRepository.getById(id)
+
     if (!deletedRole) throw new AppError('Role not found', 404)
     if (buildInRoles.includes(deletedRole.name)) {
       throw new AppError('Cannot delete built-in role', 400)
@@ -51,12 +53,7 @@ export class RolesService {
     if (users.length > 0) {
       throw new AppError('Cannot delete role assigned to users', 400)
     }
-    // set users with this role to a default role
-    const role = await RolesRepository.getOrCreate('staff')
-    users.forEach((user) => {
-      user.roleId = role.id
-      user.save()
-    })
+
     return deletedRole.destroy()
   }
 }

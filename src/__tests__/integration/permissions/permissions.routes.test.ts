@@ -28,7 +28,7 @@ describe('permissions API', () => {
     const payload = {
       userId: adminUser.id,
       email: adminUser.email,
-      role: adminRole.name,
+      roleName: adminRole.name,
     }
     adminToken = signAccessToken(payload)
     refreshToken = signRefreshToken(payload)
@@ -51,7 +51,7 @@ describe('permissions API', () => {
       expect(res.body.data.description).toBe('A test permission')
     })
     it('Should throw error for non admin role', async () => {
-      const nonAdminPayload = { userId: 3, email: 'non-admin@example.com', role: 'staff' }
+      const nonAdminPayload = { userId: 3, email: 'non-admin@example.com', roleName: 'staff' }
       const nonAdminToken = signAccessToken(nonAdminPayload)
       const nonAdminRefreshToken = signRefreshToken(nonAdminPayload)
       const nonAdminSessionCookie = `refreshToken=${nonAdminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
