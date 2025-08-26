@@ -5,9 +5,7 @@ import { PermissionsRepository } from './permissions.repository'
 export class PermissionsService {
   static async getAllPermissions() {
     const permissions = await PermissionsRepository.findAll()
-    if (!permissions) {
-      throw new AppError('No permissions found', 404)
-    }
+
     return permissions
   }
 
