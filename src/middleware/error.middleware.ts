@@ -19,11 +19,11 @@ const errorHandler = (err: Error, req: Request, res: Response) => {
   }
   if (err instanceof ValidationError) {
     const errors = err.errors.map((e) => e.message)
-    return error(res, 400, 'Validation Error', errors)
+    error(res, 400, 'Validation Error', errors)
   }
   if (err instanceof UniqueConstraintError) {
     const errors = err.errors.map((e) => e.message)
-    return error(res, 400, 'Duplicate Field Value Entered', errors)
+    error(res, 400, 'Duplicate Field Value Entered', errors)
   }
 
   logger.error(`Unexpected error: ${err}`)

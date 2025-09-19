@@ -4,133 +4,133 @@ import { RolesRepository } from '../../../components/roles/roles.repositories'
 import { User, Role } from '../../../models'
 import { parse } from '../../../utils/bcrypt.util'
 import token from '../../utils/token'
-// import { signRefreshToken } from '../../../utils/jwt.util'
+
 describe('AuthService', () => {
   const userData = {
     id: 1,
     email: 'test@example.com',
     name: 'Test User',
     roleId: 1,
+    password: '',
   }
-  const roleData = {
-    id: 1,
-    name: 'staff',
-  } as Role
-  let roleGetOrCreateSpy: unknown
-  let userCreateSpy: unknown
-  let userGetByEmailSpy: unknown
-  let userGetByIdSpy: unknown
-  beforeAll(async () => {
-    roleGetOrCreateSpy = jest.spyOn(RolesRepository, 'getOrCreate').mockResolvedValue(roleData)
+
+  const roleData = { id: 1, name: 'staff' } as unknown as Role
+
+  //add get method to role object
+  const existingRole = {
+    ...roleData,
+    get: jest.fn().mockReturnValue(roleData),
+  }
+
+  let roleGetOrCreateSpy: jest.SpyInstance
+  let userCreateSpy: jest.SpyInstance
+  let userGetByEmailSpy: jest.SpyInstance
+  let userGetByIdSpy: jest.SpyInstance
+
+  beforeAll(() => {
     userCreateSpy = jest.spyOn(AuthRepository, 'create').mockResolvedValue(userData)
     userGetByEmailSpy = jest.spyOn(AuthRepository, 'getByEmail').mockResolvedValue(null)
     userGetByIdSpy = jest.spyOn(AuthRepository, 'getById').mockResolvedValue(userData as User)
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should create a new user', async () => {
     const data = {
-      name: (userData as User).name as string,
+      name: userData.name,
       email: userData.email,
       password: 'Password123',
     }
+
+    roleGetOrCreateSpy = jest
+      .spyOn(RolesRepository, 'getOrCreate')
+      .mockResolvedValue(existingRole as unknown as Role)
+
     const result = await AuthService.register(data)
 
-    expect(userGetByEmailSpy).toHaveBeenCalled()
     expect(userGetByEmailSpy).toHaveBeenCalledWith(data.email)
-    expect(roleGetOrCreateSpy).toHaveBeenCalled()
     expect(roleGetOrCreateSpy).toHaveBeenCalledWith('staff')
-    expect(userCreateSpy).toHaveBeenCalled()
     expect(userCreateSpy).toHaveBeenCalledWith(
-      expect.objectContaining({
-        name: data.name,
-        email: data.email,
-      }),
+      expect.objectContaining({ name: data.name, email: data.email }),
     )
-    expect(result).toBeDefined()
-    expect(result).toHaveProperty('accessToken')
-    expect(result).toHaveProperty('refreshToken')
-    expect(result).toHaveProperty('user')
-    expect(AuthRepository.create).toHaveBeenCalled()
+    expect(result).toMatchObject({
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
+      user: expect.objectContaining({ email: data.email }),
+    })
   })
+
   it('should throw an error if email already exists', async () => {
-    jest.spyOn(AuthRepository, 'getByEmail').mockResolvedValue(userData as User)
+    userGetByEmailSpy.mockResolvedValueOnce(userData as User)
     await expect(
-      AuthService.register({
-        name: userData.name as string,
-        email: userData.email,
-        password: 'Password123',
-      }),
+      AuthService.register({ name: userData.name, email: userData.email, password: 'Password123' }),
     ).rejects.toThrow('This email already exists')
   })
+
   it('should login a user', async () => {
+    userData.password = await parse('Password123')
+
+    //add some sequelize methods on user objects
     const existingUser = {
       ...userData,
-      password: await parse('Password123'),
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      $get: (role: string) => jest.fn().mockResolvedValue(roleData),
+      $get: jest.fn().mockResolvedValue(existingRole),
+      getDataValue: (key: keyof typeof userData) => userData[key],
+      get: jest.fn().mockReturnValue(userData),
     }
-    userGetByEmailSpy = jest
-      .spyOn(AuthRepository, 'getByEmail')
-      .mockResolvedValue(existingUser as unknown as User)
+    userGetByEmailSpy.mockResolvedValueOnce(existingUser as unknown as User)
 
-    const result = await AuthService.login({
-      email: userData.email,
-      password: 'Password123',
+    const result = await AuthService.login({ email: userData.email, password: 'Password123' })
+
+    expect(userGetByEmailSpy).toHaveBeenCalledWith(userData.email)
+    expect(result).toMatchObject({
+      accessToken: expect.any(String),
+      refreshToken: expect.any(String),
+      user: expect.objectContaining({ email: userData.email }),
     })
-
-    expect(userGetByEmailSpy).toHaveBeenCalled()
-    expect(userGetByEmailSpy).toHaveBeenCalledWith(existingUser.email)
-    expect(result).toBeDefined()
-    expect(result).toHaveProperty('accessToken')
-    expect(result).toHaveProperty('refreshToken')
-    expect(result).toHaveProperty('user')
-    expect(result.user.email).toBe(userData.email)
   })
+
   it('should throw an error if user not found during login', async () => {
-    jest.spyOn(AuthRepository, 'getByEmail').mockResolvedValue(null)
+    userGetByEmailSpy.mockResolvedValueOnce(null)
     await expect(
-      AuthService.login({
-        email: userData.email,
-        password: 'Password123',
-      }),
+      AuthService.login({ email: userData.email, password: 'Password123' }),
     ).rejects.toThrow('User not found')
   })
+
   it('should throw an error if password is incorrect', async () => {
     const existingUser = {
       ...userData,
       password: await parse('Invalid'),
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      $get: (role: string) => jest.fn().mockResolvedValue(roleData),
+      $get: jest.fn().mockResolvedValue(roleData),
+      getDataValue: (key: keyof typeof userData) => userData[key],
     }
-    jest.spyOn(AuthRepository, 'getByEmail').mockResolvedValue(existingUser as unknown as User)
+    userGetByEmailSpy.mockResolvedValueOnce(existingUser as unknown as User)
     await expect(
-      AuthService.login({
-        email: userData.email,
-        password: 'WrongPassword',
-      }),
+      AuthService.login({ email: userData.email, password: 'WrongPassword' }),
     ).rejects.toThrow('Wrong password')
   })
+
   it('should refresh access token', async () => {
-    const refreshToken = token(userData).refreshToken
-    const result = await AuthService.refresh(refreshToken)
-    expect(result).toBeDefined()
+    const refreshTokenValue = token(userData).refreshToken
+    const result = await AuthService.refresh(refreshTokenValue)
     expect(result).toHaveProperty('accessToken')
   })
+
   it('should throw an error if refresh token is invalid', async () => {
     await expect(AuthService.refresh('invalid-token')).rejects.toThrow(
       'Invalid or expired refresh token',
     )
   })
+
   it('should get current user by ID', async () => {
     const result = await AuthService.getCurrentUser(userData.id)
-    expect(userGetByIdSpy).toHaveBeenCalled()
     expect(userGetByIdSpy).toHaveBeenCalledWith(userData.id)
-    expect(result).toBeDefined()
-    expect(result.email).toBe(userData.email)
-    expect(result.name).toBe(userData.name)
+    expect(result).toMatchObject({ email: userData.email, name: userData.name })
   })
+
   it('should throw an error if user not found by ID', async () => {
-    jest.spyOn(AuthRepository, 'getById').mockResolvedValue(null)
+    userGetByIdSpy.mockResolvedValueOnce(null)
     await expect(AuthService.getCurrentUser(9999)).rejects.toThrow('User not found')
   })
 })

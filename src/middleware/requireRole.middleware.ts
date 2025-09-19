@@ -5,9 +5,12 @@ import { error } from '../utils/response.util'
 export function authorizeRole(...allowedRoles: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user
-    if (!user || !allowedRoles.includes(user.roleName)) {
-      error(res, 403, 'Access denied: insufficient role')
+
+    // Allow if 'owner' is specified or user's role is allowed
+    if (allowedRoles.includes('owner') || (user && allowedRoles.includes(user.roleName))) {
+      return next()
     }
-    next()
+
+    error(res, 403, 'Access denied: insufficient role')
   }
 }

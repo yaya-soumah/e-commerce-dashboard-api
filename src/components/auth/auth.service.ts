@@ -8,6 +8,11 @@ import { AuthRepository } from './auth.repository'
 
 export class AuthService {
   private static payload(user: any, role: any) {
+    console.log('auth-service-payload:', {
+      userId: user.id,
+      email: user.email,
+      roleName: role.name,
+    })
     return { userId: user.id, email: user.email, roleName: role.name }
   }
   static async register(data: { name: string; email: string; password: string }) {
@@ -24,20 +29,26 @@ export class AuthService {
       roleId: role.id,
     })
 
-    const accessToken = signAccessToken(this.payload(user, role))
-    const refreshToken = signRefreshToken(this.payload(user, role))
+    const accessToken = signAccessToken(this.payload(user, role.get({ plain: true })))
+    const refreshToken = signRefreshToken(this.payload(user, role.get({ plain: true })))
 
     return { accessToken, refreshToken, user }
   }
 
   static async login(data: { email: string; password: string }) {
     const user = await AuthRepository.getByEmail(data.email)
+
     if (!user) throw new AppError('User not found', 404)
-    const match = await compare(data.password, user.password)
+    const match = await compare(data.password, user.getDataValue('password'))
+
     if (!match) throw new AppError('Wrong password', 400)
     const role = await user.$get('role')
-    const accessToken = signAccessToken(this.payload(user, role))
-    const refreshToken = signRefreshToken(this.payload(user, role))
+    const accessToken = signAccessToken(
+      this.payload(user.get({ plain: true }), role?.get({ plain: true })),
+    )
+    const refreshToken = signRefreshToken(
+      this.payload(user.get({ plain: true }), role?.get({ plain: true })),
+    )
 
     return { accessToken, refreshToken, user }
   }

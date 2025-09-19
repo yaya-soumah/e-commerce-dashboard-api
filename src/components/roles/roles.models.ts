@@ -32,7 +32,7 @@ export class Role extends Model<RoleAttributes, RoleCreationAttributes> {
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
-  name!: string
+  declare name: string
 
   @HasMany(() => User)
   users?: User[]

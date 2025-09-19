@@ -28,7 +28,7 @@ export class RolesService {
     if (name) {
       const roleWithName = await RolesRepository.getByName(name)
       if (!roleWithName) {
-        existingRole.name = name
+        existingRole.update({ name })
       } else if (roleWithName.id !== id) {
         throw new AppError('Role with this name already exists', 400)
       }

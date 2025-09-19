@@ -3,24 +3,10 @@ import { RolesService } from '../../../components/roles/roles.service'
 import { Role } from '../../../models'
 
 describe('RoleService', () => {
-  const roleData = 'staff'
-  let createSpy = jest
-    .spyOn(RolesRepository, 'create')
-    .mockResolvedValue({ id: 1, name: 'staff' } as Role)
+  const roleData = { id: 1, name: 'staff' }
 
-  let getByNameSpy = jest
-    .spyOn(RolesRepository, 'getByName')
-    .mockResolvedValue({ id: 1, name: 'staff' } as Role)
-
-  let getByIdSpy = jest
-    .spyOn(RolesRepository, 'getById')
-    .mockResolvedValue({ id: 1, name: 'staff' } as Role)
-  let getAllSpy = jest
-    .spyOn(RolesRepository, 'getAll')
-    .mockResolvedValue([{ id: 1, name: 'staff' }] as Role[])
   const existingRole = {
-    id: 1,
-    name: 'staff',
+    ...roleData,
     $add(permissions: string, list: string[]) {
       this.permissions = list
     },
@@ -32,13 +18,31 @@ describe('RoleService', () => {
     },
     permissions: [''],
     users: [],
-    destroy() {},
+    destroy: jest.fn(),
+    update({ name }: { name: string }) {
+      this.name = name
+    },
   }
+  let createSpy = jest
+    .spyOn(RolesRepository, 'create')
+    .mockResolvedValue(existingRole as unknown as Role)
+
+  let getByNameSpy = jest
+    .spyOn(RolesRepository, 'getByName')
+    .mockResolvedValue(existingRole as unknown as Role)
+
+  let getByIdSpy = jest
+    .spyOn(RolesRepository, 'getById')
+    .mockResolvedValue(existingRole as unknown as Role)
+  let getAllSpy = jest
+    .spyOn(RolesRepository, 'getAll')
+    .mockResolvedValue([existingRole] as unknown as Role[])
+
   describe('Create new Role', () => {
     //create new role
     it('Should create a new role', async () => {
       getByNameSpy = jest.spyOn(RolesRepository, 'getByName').mockResolvedValue(null)
-      const role = await RolesService.createRole(roleData)
+      const role = await RolesService.createRole(roleData.name)
       expect(createSpy).toHaveBeenCalled()
       expect(role.name).toBe('staff')
     })
@@ -47,9 +51,9 @@ describe('RoleService', () => {
       getByNameSpy = jest
         .spyOn(RolesRepository, 'getByName')
         .mockResolvedValue({ id: 1, name: 'staff' } as Role)
-      await expect(RolesService.createRole(roleData)).rejects.toThrow('Role already exists')
+      await expect(RolesService.createRole(roleData.name)).rejects.toThrow('Role already exists')
       expect(getByNameSpy).toHaveBeenCalled()
-      expect(getByNameSpy).toHaveBeenCalledWith(roleData)
+      expect(getByNameSpy).toHaveBeenCalledWith(roleData.name)
     })
   })
   describe('Get role by id', () => {

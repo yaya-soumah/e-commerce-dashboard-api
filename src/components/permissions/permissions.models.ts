@@ -24,11 +24,11 @@ export class Permission extends Model<PermissionAttributes, PermissionCreationAt
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
-  key!: string
+  declare key: string
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  description!: string
+  declare description: string
 
   @BelongsToMany(() => Role, () => RolePermission)
   roles?: Role[]

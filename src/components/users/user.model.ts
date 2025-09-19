@@ -42,28 +42,28 @@ export type { UserAttributes, UserCreationAttributes }
 })
 export class User extends Model<UserAttributes, UserCreationAttributes> {
   @Column(DataType.STRING)
-  name?: string
+  declare name?: string
 
   @Unique
   @AllowNull(false)
   @Column(DataType.STRING)
-  email!: string
+  declare email: string
 
   @AllowNull(false)
   @Column(DataType.STRING)
-  password!: string
+  declare password: string
 
   @AllowNull(false)
   @ForeignKey(() => Role)
   @Column(DataType.INTEGER)
-  roleId!: number
+  declare roleId: number
 
   @Default('active')
   @Column(DataType.ENUM('active', 'inactive', 'blocked'))
-  status?: string
+  declare status?: string
 
   @Column(DataType.STRING)
-  avatar?: string
+  declare avatar?: string
 
   @BelongsTo(() => Role)
   role?: Role
