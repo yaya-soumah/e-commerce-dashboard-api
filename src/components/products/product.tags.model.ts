@@ -2,7 +2,7 @@ import { Table, Column, ForeignKey, DataType, Model, AllowNull } from 'sequelize
 
 import { Tag, Product } from '../../models'
 
-@Table({ tableName: 'product_tags' })
+@Table({ tableName: 'ecommerce_product_tags' })
 export class ProductTag extends Model {
   @ForeignKey(() => Product)
   @AllowNull(false)
