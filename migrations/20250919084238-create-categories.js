@@ -23,14 +23,14 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: true,
       },
-      parendId: {
+      parentId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: true,
         references: {
           model: 'ecommerce_categories',
           key: 'id',
         },
-        onDelete: 'CASCADE',
+        onDelete: 'SET NULL',
         onUpdate: 'CASCADE',
       },
       createdAt: {

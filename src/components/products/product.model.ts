@@ -8,12 +8,27 @@ import {
   HasMany,
   BelongsToMany,
 } from 'sequelize-typescript'
+import { Optional } from 'sequelize'
+
+interface ProductDataType {
+  id: number
+  name: string
+  slug: string
+  description?: string
+  price: number
+  status: string
+  stock: number
+  sku?: string
+  categoryId?: number
+}
+
+type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku'>
 
 import { Category, ProductTag, ProductImage, Tag } from '../../models'
 import { generateSlug } from '../../utils/slag'
 
 @Table({ tableName: 'ecommerce_products', timestamps: true })
-export class Product extends Model<Product> {
+export class Product extends Model<ProductDataType, ProductCreationDataType> {
   @Column({
     type: DataType.STRING,
     unique: true,
