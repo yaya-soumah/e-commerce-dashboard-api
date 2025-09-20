@@ -4,7 +4,7 @@ export const success = (
   res: Response,
   statusCode: number,
   data: any,
-  message: string = 'Operation successfull',
+  message: string = 'Operation successful',
   meta: any = {},
 ) => {
   if ('page' in data) {

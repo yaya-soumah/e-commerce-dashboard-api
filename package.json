@@ -25,11 +25,11 @@
     "format": "prettier --write .",
     "test": "jest",
     "test:cov": "jest --coverage"
-  },  
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yaya-soumah/e-commerce-dashboard-api.git"
-  },  
+  },
   "bugs": {
     "url": "https://github.com/yaya-soumah/e-commerce-dashboard-api/issues"
   },
@@ -43,6 +43,7 @@
     "express": "^5.1.0",
     "express-rate-limit": "^8.0.1",
     "helmet": "^8.1.0",
+    "http-status-codes": "^2.3.0",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "pg": "^8.16.3",

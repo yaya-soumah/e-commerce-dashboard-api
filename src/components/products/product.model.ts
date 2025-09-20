@@ -19,10 +19,10 @@ interface ProductDataType {
   status: string
   stock: number
   sku?: string
-  categoryId?: number
+  categoryId: number
 }
 
-type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku'>
+type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku' | 'slug'>
 
 import { Category, ProductTag, ProductImage, Tag } from '../../models'
 import { generateSlug } from '../../utils/slag'

@@ -85,7 +85,6 @@ const defaultProducts = [
     name: 'Smartphones X',
     description: 'Latest smartphone with advanced features',
     price: 699.99,
-    slug: generateSlug('Smartphones X'),
     status: 'active',
     stock: 100,
     sku: 'SPX-001',

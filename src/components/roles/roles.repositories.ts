@@ -17,6 +17,7 @@ export class RolesRepository {
   static async getById(id: number) {
     return Role.findByPk(id)
   }
+
   static async getAll() {
     return Role.findAll({
       include: {
