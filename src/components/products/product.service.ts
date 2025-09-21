@@ -5,11 +5,25 @@ import { ProductRepository } from './product.repository'
 import { ProductDataType } from './product.types'
 
 export class ProductService {
+  static async verifyUniqueness(name: string | undefined, sku: string | undefined) {
+    if (name) {
+      const existingProduct = await ProductRepository.getByName(name)
+      if (existingProduct) throw new AppError('Name must be unique', 400)
+    }
+    if (sku) {
+      const existingProduct = await ProductRepository.getBySku(sku)
+      if (existingProduct) throw new AppError('Sku must be unique', 400)
+    }
+  }
   static async create(data: ProductDataType) {
+    const { name, sku } = data ? data : {}
+    await this.verifyUniqueness(name, sku)
     return await ProductRepository.create(data)
   }
 
   static async update(id: number, data: Partial<ProductDataType>) {
+    const { name, sku } = data ? data : {}
+    await this.verifyUniqueness(name, sku)
     const product = await ProductRepository.update(id, data)
     if (!product) {
       throw new AppError('Product not found', 404)
@@ -39,7 +53,6 @@ export class ProductService {
       limit,
       offset,
       ...search,
-      tags: search.tags ? search.tags.split(',') : undefined,
     }
     const { products, total } = await ProductRepository.getAll(filter)
     return {

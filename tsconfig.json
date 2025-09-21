@@ -12,6 +12,7 @@
     "resolveJsonModule": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "isolatedModules":true,
     "types": ["node", "sequelize-typescript", "jest"]
   },
   "include": ["src", "src/config", "__tests__"],

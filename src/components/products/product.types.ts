@@ -9,23 +9,13 @@ export type ProductDataType = {
   tags: string[]
   images: string[]
 }
-export type ProductUpdateDataType = {
-  description?: string
-  price?: number
-  status?: string
-  stock?: number
-  sku?: string
-  categoryId?: number
-  tags?: string[]
-  images?: string[]
-}
 export type FilterData = {
-  name?: string
-  categoryId?: number
+  keyword?: string
+  category?: string
+  stock?: number
+  status?: string
   priceMin?: number
   priceMax?: number
-  status?: string
-  tags?: string[]
   limit?: number
   offset?: number
 }

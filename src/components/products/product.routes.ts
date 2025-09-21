@@ -11,8 +11,8 @@ const router = Router()
 
 router.use(authenticateToken)
 
-router.get('/', authorizeRole('admin', 'staff'), ProductController.listHandler)
-router.get('/:id', authorizeRole('admin', 'staff'), ProductController.getByIdHandler)
+router.get('/', ProductController.listHandler)
+router.get('/:id', ProductController.getByIdHandler)
 router.post(
   '/',
   authorizeRole('admin', 'staff'),

@@ -3,7 +3,7 @@ import { Op } from 'sequelize'
 import sequelize from '../../config/database.config'
 import { Product, Category, Tag, ProductImage } from '../../models'
 
-import { ProductDataType, FilterData, ProductUpdateDataType } from './product.types'
+import { ProductDataType, FilterData } from './product.types'
 
 export class ProductRepository {
   // Create a product
@@ -47,7 +47,7 @@ export class ProductRepository {
   }
 
   // Update product
-  static async update(id: number, data: ProductUpdateDataType) {
+  static async update(id: number, data: Partial<ProductDataType>) {
     const transaction = await sequelize.transaction()
     try {
       const product = await Product.findByPk(id, { transaction })
@@ -99,29 +99,39 @@ export class ProductRepository {
     })
   }
 
+  // get a product by name
+  static async getByName(name: string) {
+    return await Product.findOne({ where: { name } })
+  }
+
+  // get a product by sku
+  static async getBySku(sku: string) {
+    return await Product.findOne({ where: { sku } })
+  }
+
   // Get list of products
   static async getAll(filter: FilterData) {
-    const { name, categoryId, priceMin, priceMax, status, tags, limit = 1, offset = 0 } = filter
+    const { keyword, priceMin, priceMax, status, stock, limit = 1, offset = 0 } = filter
 
-    const where: any = {}
-    if (name) where.name = { [Op.like]: `%${name.toLowerCase()}%` }
-    if (categoryId) where.categoryId = categoryId
+    let where: any = {}
+    if (keyword)
+      where = {
+        ...where,
+        [Op.or]: [
+          { name: { [Op.like]: `%${keyword.toLowerCase()}%` } },
+          { description: { [Op.like]: `%${keyword.toLowerCase()}%` } },
+        ],
+      }
+
     if (priceMin) where.price = { [Op.gte]: priceMin }
     if (priceMax) where.price = { ...(where.price || {}), [Op.lte]: priceMax }
     if (status) where.status = status
+    if (stock) where.stock = stock
 
     const include: any[] = [
       { model: Category, as: 'category' },
       { model: ProductImage, as: 'images' },
     ]
-    if (tags?.length) {
-      include.push({
-        model: Tag,
-        as: 'tags',
-        where: { name: { [Op.in]: tags } },
-        through: { attributes: [] },
-      })
-    }
 
     const { rows, count } = await Product.findAndCountAll({
       where,
