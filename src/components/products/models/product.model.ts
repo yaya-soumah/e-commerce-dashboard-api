@@ -24,8 +24,8 @@ interface ProductDataType {
 
 type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku' | 'slug'>
 
-import { Category, ProductTag, ProductImage, Tag } from '../../models'
-import { generateSlug } from '../../utils/slag'
+import { Category, ProductTag, ProductImage, Tag } from '../../../models'
+import { generateSlug } from '../../../utils/slag'
 
 @Table({ tableName: 'ecommerce_products', timestamps: true })
 export class Product extends Model<ProductDataType, ProductCreationDataType> {

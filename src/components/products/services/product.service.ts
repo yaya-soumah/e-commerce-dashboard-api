@@ -1,8 +1,7 @@
-import { AppError } from '../../utils/app-error.util'
-import { parseQuery } from '../../utils/pagination'
-
-import { ProductRepository } from './product.repository'
-import { ProductDataType } from './product.types'
+import { AppError } from '../../../utils/app-error.util'
+import { parseQuery } from '../../../utils/pagination'
+import { ProductRepository } from '../repositories/product.repository'
+import { ProductDataType } from '../schemas/product.types'
 
 export class ProductService {
   static async verifyUniqueness(name: string | undefined, sku: string | undefined) {

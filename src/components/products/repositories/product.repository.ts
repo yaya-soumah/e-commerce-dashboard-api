@@ -1,9 +1,8 @@
 import { Op } from 'sequelize'
 
-import sequelize from '../../config/database.config'
-import { Product, Category, Tag, ProductImage } from '../../models'
-
-import { ProductDataType, FilterData } from './product.types'
+import sequelize from '../../../config/database.config'
+import { Product, Category, Tag, ProductImage } from '../../../models'
+import { ProductDataType, FilterData } from '../schemas/product.types'
 
 export class ProductRepository {
   // Create a product

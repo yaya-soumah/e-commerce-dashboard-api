@@ -9,7 +9,7 @@ import {
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Product } from '../products/product.model'
+import { Product } from '../../models'
 import { generateSlug } from '../../utils/slag'
 
 interface CategoryDataType {
