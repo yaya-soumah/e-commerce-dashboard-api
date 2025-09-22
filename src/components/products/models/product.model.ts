@@ -7,6 +7,7 @@ import {
   BelongsTo,
   HasMany,
   BelongsToMany,
+  HasOne,
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
@@ -17,14 +18,13 @@ interface ProductDataType {
   description?: string
   price: number
   status: string
-  stock: number
   sku?: string
   categoryId: number
 }
 
 type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku' | 'slug'>
 
-import { Category, ProductTag, ProductImage, Tag } from '../../../models'
+import { Category, ProductTag, ProductImage, Tag, Inventory } from '../../../models'
 import { generateSlug } from '../../../utils/slag'
 
 @Table({ tableName: 'ecommerce_products', timestamps: true })
@@ -95,4 +95,7 @@ export class Product extends Model<ProductDataType, ProductCreationDataType> {
 
   @HasMany(() => ProductImage, 'productId')
   images?: ProductImage[]
+
+  @HasOne(() => Inventory, 'productId')
+  inventory?: number
 }
