@@ -1,10 +1,11 @@
 import { Router } from 'express'
 
-import { authenticateToken } from '../../../middleware/auth.middleware'
-import { authorizeRole } from '../../../middleware/requireRole.middleware'
-import { validate } from '../../../middleware/validate.middleware'
-import { ProductCreate, ProductUpdate } from '../schemas/product.schema'
-import { ProductController } from '../controllers/product.controller'
+import { authenticateToken } from '../../middleware/auth.middleware'
+import { authorizeRole } from '../../middleware/requireRole.middleware'
+import { validate } from '../../middleware/validate.middleware'
+
+import { ProductController } from './product.controller'
+import { ProductCreate, ProductUpdate } from './product.schema'
 
 const router = Router()
 

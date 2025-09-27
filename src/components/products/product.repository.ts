@@ -1,17 +1,23 @@
 import { Op } from 'sequelize'
 
-import sequelize from '../../../config/database.config'
-import { Product, Category, Tag, ProductImage } from '../../../models'
-import { ProductDataType, FilterData } from '../schemas/product.types'
+import sequelize from '../../config/database.config'
+import { Product, Category, Tag, ProductImage, Inventory } from '../../models'
+
+import { FilterData } from './product.types'
+import { ProductCreateDataType } from './product.schema'
 
 export class ProductRepository {
   // Create a product
-  static async create(data: ProductDataType) {
+  static async create(data: ProductCreateDataType) {
     const transaction = await sequelize.transaction()
     try {
-      const { images, tags, ...rest } = data
+      const { images, tags, stock, lowStockLevel, ...rest } = data
       const product = await Product.create(rest, { transaction })
-
+      //create inventory
+      await Inventory.create(
+        { productId: product.id, stock: stock || 0, lowStockLevel: lowStockLevel || 0 },
+        { transaction },
+      )
       if (tags?.length) {
         const tagInstances = []
 
@@ -34,9 +40,10 @@ export class ProductRepository {
       await transaction.commit()
       return Product.findByPk(product.id, {
         include: [
-          { model: Category, as: 'category' },
+          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'description'] },
           { model: Tag, as: 'tags' },
           { model: ProductImage, as: 'images' },
+          { model: Inventory, attributes: ['id', 'stock'] },
         ],
       })
     } catch (err) {
@@ -46,34 +53,55 @@ export class ProductRepository {
   }
 
   // Update product
-  static async update(id: number, data: Partial<ProductDataType>) {
+  static async update(id: number, data: Partial<ProductCreateDataType>) {
     const transaction = await sequelize.transaction()
     try {
+      const { images, tags, stock, lowStockLevel, ...rest } = data
       const product = await Product.findByPk(id, { transaction })
-      if (!product) return null
-
-      await product.update(data, { transaction })
-
-      if (data.tags) {
-        const tags = await Tag.findAll({
-          where: { name: { [Op.in]: data.tags } },
-          transaction,
-        })
-        await product.$set('tags', tags)
+      if (!product) {
+        await transaction.rollback()
+        return null
       }
 
-      if (data.images) {
+      await product.update(rest, { transaction })
+
+      if (stock !== undefined || lowStockLevel !== undefined) {
+        const inventory = await Inventory.findOne({ where: { productId: product.id }, transaction })
+        if (inventory) {
+          const updateData: Record<string, any> = {}
+          if (stock !== undefined) updateData.stock = stock
+          if (lowStockLevel !== undefined) updateData.lowStockLevel = lowStockLevel
+          await inventory.update(updateData, { transaction })
+        }
+      }
+
+      if (tags) {
+        const tagInstances = []
+        for (const tagName of tags) {
+          const [tag] = await Tag.findOrCreate({
+            where: { name: tagName },
+            transaction,
+          })
+          tagInstances.push(tag)
+        }
+        await product.$set('tags', tagInstances, { transaction })
+      }
+
+      if (images) {
         await ProductImage.destroy({ where: { productId: product.id }, transaction })
-        const images = data.images.map((url) => ({ url, productId: product.id }))
-        await ProductImage.bulkCreate(images, { transaction })
+        if (images.length) {
+          const allImages = images.map((url) => ({ url, productId: product.id }))
+          await ProductImage.bulkCreate(allImages, { transaction })
+        }
       }
 
       await transaction.commit()
       return Product.findByPk(id, {
         include: [
-          { model: Category, as: 'category' },
+          { model: Category, as: 'category', attributes: ['id', 'name', 'slug', 'description'] },
           { model: Tag, as: 'tags' },
           { model: ProductImage, as: 'images' },
+          { model: Inventory, attributes: ['id', 'stock'] },
         ],
       })
     } catch (err) {

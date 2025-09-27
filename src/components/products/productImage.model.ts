@@ -1,7 +1,7 @@
 import { Table, Model, Column, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Product } from '../../../models'
+import { Product } from '../../models'
 
 interface ProductImageDataType {
   id: number

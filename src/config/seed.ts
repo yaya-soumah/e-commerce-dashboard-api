@@ -1,4 +1,4 @@
-import { Role, Permission, User, Product, Category, Tag, ProductImage } from '../models'
+import { Role, Permission, User, Product, Inventory, Category, Tag, ProductImage } from '../models'
 import { parse } from '../utils/bcrypt.util'
 import { generateSlug } from '../utils/slag'
 
@@ -185,11 +185,12 @@ export const seedDatabase = async () => {
     //seed product
 
     for (const prod of defaultProducts) {
-      const { images, tags, ...rest } = prod
+      const { images, tags, stock, ...rest } = prod
       const [product] = await Product.findOrCreate({
-        where: { name: Product.name },
+        where: { name: rest.name },
         defaults: rest,
       })
+      await Inventory.create({ productId: product.id, stock: stock || 0 })
 
       if (tags) {
         const ownTags = tagList.filter((item) => tags.includes(item.name))

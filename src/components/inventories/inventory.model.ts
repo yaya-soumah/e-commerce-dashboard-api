@@ -1,15 +1,16 @@
 import { Table, Column, DataType, ForeignKey, BelongsTo, Model } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Product } from '../../../models'
+import { Product } from '../../models'
 
-interface InventoryDataType {
-  id: number
-  productId: number
-  stock: number
-  lowStockLevel?: number
-  lastRestockedAt?: Date
-}
+import { InventoryDataType } from './inventory.type'
+// interface InventoryDataType {
+//   id: number
+//   productId: number
+//   stock: number
+//   lowStockLevel?: number
+//   lastRestockedAt?: Date
+// }
 
 type InventoryCreateDataType = Optional<
   InventoryDataType,

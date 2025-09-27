@@ -8,10 +8,11 @@ import {
   ForeignKey,
   BelongsTo,
   Default,
+  HasMany,
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Role } from '../roles/roles.models'
+import { Role, InventoryHistory } from '../../models'
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -67,4 +68,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
 
   @BelongsTo(() => Role)
   role?: Role
+
+  @HasMany(() => InventoryHistory, 'userId')
+  inventory?: InventoryHistory
 }

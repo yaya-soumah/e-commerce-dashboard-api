@@ -131,13 +131,14 @@ describe('Product Component', () => {
           description: 'A test product',
           price: 99.99,
           status: 'active',
-          stock: 50,
+          lowStockLevel: 0,
+          stock: 100,
           sku: 'TEST-001',
           categoryId,
           tags: ['test'],
           images: ['https://example.com/test.jpg'],
         })
-
+      console.log('admin create product**', res.body)
       expect(res.status).toBe(201)
       expect(res.body.status).toBe('success')
       expect(res.body.data.name).toBe('Test Product')
@@ -155,12 +156,15 @@ describe('Product Component', () => {
           description: 'A staff-created product',
           price: 49.99,
           status: 'draft',
+          lowStockLevel: 0,
           stock: 100,
           sku: 'STAFF-001',
           categoryId,
           tags: ['staff'],
           images: ['https://example.com/staff.jpg'],
         })
+
+      console.log('staff create product**', res.body)
 
       expect(res.status).toBe(201)
       expect(res.body.status).toBe('success')
@@ -178,7 +182,8 @@ describe('Product Component', () => {
           description: 'Should fail',
           price: 29.99,
           status: 'active',
-          stock: 10,
+          lowStockLevel: 0,
+          stock: 100,
           categoryId,
         })
 
@@ -193,8 +198,9 @@ describe('Product Component', () => {
         description: 'First product',
         price: 29.99,
         status: 'active',
-        stock: 10,
         sku: 'UNIQUE-001',
+        lowStockLevel: 0,
+        stock: 100,
         categoryId,
       })
 
@@ -207,11 +213,12 @@ describe('Product Component', () => {
           description: 'Second product with same name',
           price: 39.99,
           status: 'active',
+          lowStockLevel: 0,
           stock: 20,
           sku: 'UNIQUE-002',
           categoryId,
         })
-
+      console.log('failed duplicate create product**', res.body)
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('Name must be unique')
     })
@@ -224,6 +231,7 @@ describe('Product Component', () => {
         .send({
           name: '',
           price: -10,
+          lowStockLevel: 0,
           stock: -5,
           status: 'invalid',
           categoryId: 999,
@@ -243,7 +251,8 @@ describe('Product Component', () => {
         description: 'A product for filtering',
         price: 59.99,
         status: 'active',
-        stock: 20,
+        lowStockLevel: 0,
+        stock: 50,
         sku: 'FILTER-001',
         categoryId,
       })
@@ -268,7 +277,8 @@ describe('Product Component', () => {
         description: 'A product for detail view',
         price: 79.99,
         status: 'active',
-        stock: 30,
+        lowStockLevel: 0,
+        stock: 100,
         sku: 'DETAIL-001',
         categoryId,
       })
@@ -292,7 +302,8 @@ describe('Product Component', () => {
         description: 'A product to update',
         price: 89.99,
         status: 'draft',
-        stock: 40,
+        lowStockLevel: 0,
+        stock: 100,
         sku: 'UPDATE-001',
         categoryId,
       })
@@ -316,7 +327,8 @@ describe('Product Component', () => {
         description: 'A product to delete',
         price: 69.99,
         status: 'active',
-        stock: 50,
+        lowStockLevel: 0,
+        stock: 100,
         sku: 'DELETE-001',
         categoryId,
       })

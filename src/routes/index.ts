@@ -4,7 +4,7 @@ import authRouter from '../components/auth/auth.routes'
 import roleRouter from '../components/roles/roles.routes'
 import permissionsRouter from '../components/permissions/permissions.routes'
 import userRouter from '../components/users/user.routes'
-import productRouter from '../components/products/routers/product.routes'
+import productRouter from '../components/products/product.routes'
 const router = Router()
 
 router.use('/auth', authRouter)

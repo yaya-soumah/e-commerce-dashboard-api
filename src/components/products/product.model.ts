@@ -11,21 +11,12 @@ import {
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-interface ProductDataType {
-  id: number
-  name: string
-  slug: string
-  description?: string
-  price: number
-  status: string
-  sku?: string
-  categoryId: number
-}
+import { Category, ProductTag, ProductImage, Tag, Inventory } from '../../models'
+import { generateSlug } from '../../utils/slag'
+
+import { ProductDataType } from './product.types'
 
 type ProductCreationDataType = Optional<ProductDataType, 'id' | 'categoryId' | 'sku' | 'slug'>
-
-import { Category, ProductTag, ProductImage, Tag, Inventory } from '../../../models'
-import { generateSlug } from '../../../utils/slag'
 
 @Table({ tableName: 'ecommerce_products', timestamps: true })
 export class Product extends Model<ProductDataType, ProductCreationDataType> {
@@ -65,13 +56,6 @@ export class Product extends Model<ProductDataType, ProductCreationDataType> {
     defaultValue: 'draft',
   })
   declare status: 'active' | 'draft' | 'archived'
-
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    defaultValue: 0,
-  })
-  declare stock: number
 
   @Column({
     type: DataType.STRING,

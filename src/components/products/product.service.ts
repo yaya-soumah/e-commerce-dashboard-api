@@ -1,7 +1,9 @@
-import { AppError } from '../../../utils/app-error.util'
-import { parseQuery } from '../../../utils/pagination'
-import { ProductRepository } from '../repositories/product.repository'
-import { ProductDataType } from '../schemas/product.types'
+import { AppError } from '../../utils/app-error.util'
+import { parseQuery } from '../../utils/pagination'
+import { InventoryRepository } from '../inventories/inventory.repository'
+
+import { ProductRepository } from './product.repository'
+import { ProductCreateDataType } from './product.schema'
 
 export class ProductService {
   static async verifyUniqueness(name: string | undefined, sku: string | undefined) {
@@ -14,13 +16,13 @@ export class ProductService {
       if (existingProduct) throw new AppError('Sku must be unique', 400)
     }
   }
-  static async create(data: ProductDataType) {
+  static async create(data: ProductCreateDataType) {
     const { name, sku } = data ? data : {}
     await this.verifyUniqueness(name, sku)
     return await ProductRepository.create(data)
   }
 
-  static async update(id: number, data: Partial<ProductDataType>) {
+  static async update(id: number, data: Partial<ProductCreateDataType>) {
     const { name, sku } = data ? data : {}
     await this.verifyUniqueness(name, sku)
     const product = await ProductRepository.update(id, data)
@@ -31,11 +33,15 @@ export class ProductService {
   }
 
   static async remove(id: number) {
-    const result = await ProductRepository.delete(id)
-    if (!result) {
+    const inventory = await InventoryRepository.getByProductId(id)
+    if (inventory && inventory.stock > 0) {
+      throw new AppError('This product cannot be deleted because the stock is not empty')
+    }
+    const deleted = await ProductRepository.delete(id)
+    if (!deleted) {
       throw new AppError('Product not found', 404)
     }
-    return result
+    return deleted
   }
 
   static async getById(id: number) {

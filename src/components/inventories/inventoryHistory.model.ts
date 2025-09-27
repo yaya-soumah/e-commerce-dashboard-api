@@ -1,12 +1,12 @@
 import { Table, Column, DataType, Model, ForeignKey, BelongsTo } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Product, User } from '../../../models'
+import { Product, User } from '../../models'
 interface InventoryHistoryDataType {
   id: number
   productId: number
   change: number
-  raison: string
+  reason: string
   userId: number
 }
 type InventoryHistoryCreateDataType = Optional<InventoryHistoryDataType, 'id'>
@@ -37,7 +37,7 @@ export class InventoryHistory extends Model<
     type: DataType.STRING,
     allowNull: false,
   })
-  declare raison: string
+  declare reason: string
 
   @ForeignKey(() => User)
   @Column({ type: DataType.INTEGER, allowNull: false })

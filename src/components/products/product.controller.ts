@@ -1,7 +1,8 @@
 import { Request, Response, NextFunction } from 'express'
 
-import { success } from '../../../utils/response.util'
-import { ProductService } from '../services/product.service'
+import { success } from '../../utils/response.util'
+
+import { ProductService } from './product.service'
 
 export class ProductController {
   static async createProductHandler(req: Request, res: Response, next: NextFunction) {

@@ -3,11 +3,12 @@ import { Role } from '../components/roles/roles.models'
 import { Permission } from '../components/permissions/permissions.models'
 import { RolePermission } from '../components/roles/rolePermissions.models'
 import { Category } from '../components/categories/category.model'
-import { Product } from '../components/products/models/product.model'
-import { ProductTag } from '../components/products/models/product.tags.model'
-import { ProductImage } from '../components/products/models/productImage.model'
+import { Product } from '../components/products/product.model'
+import { ProductTag } from '../components/products/product.tags.model'
+import { ProductImage } from '../components/products/productImage.model'
 import { Tag } from '../components/tags/tag.model'
-import { Inventory } from '../components/products/models/inventory.model'
+import { Inventory } from '../components/inventories/inventory.model'
+import { InventoryHistory } from '../components/inventories/inventoryHistory.model'
 
 export const models = [
   User,
@@ -20,6 +21,7 @@ export const models = [
   ProductImage,
   Tag,
   Inventory,
+  InventoryHistory,
 ]
 
 export {
@@ -33,4 +35,5 @@ export {
   ProductImage,
   Tag,
   Inventory,
+  InventoryHistory,
 }
