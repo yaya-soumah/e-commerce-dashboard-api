@@ -116,7 +116,7 @@ export class InventoryRepository {
     if (reason) {
       where.reason = { [Op.like]: `%${reason.toLocaleLowerCase()}%` }
     }
-    return await InventoryHistory.findAll({
+    return await InventoryHistory.findAndCountAll({
       where,
       include: [
         { model: User, as: 'user', attributes: ['id', 'name'] },
