@@ -1,23 +1,22 @@
 import request from 'supertest'
 
 import app from '../../../app'
-import { signAccessToken, signRefreshToken } from '../../../utils/jwt.util'
+import { generateTokens } from '../../utils/loader'
 
 import { authFactory } from './auth.factory'
 
 describe('Auth API', () => {
   let adminToken: string
-  let adminRefreshToken: string
   let adminSessionCookie: string
   let nonAdminToken: string
-  let adminPayload = { userId: 1, email: 'admin@example.com', roleName: 'admin' }
-  let nonAdminPayload = { userId: 2, email: 'nonAdmin@example.com', roleName: 'staff' }
 
   beforeAll(async () => {
-    adminToken = signAccessToken(adminPayload)
-    adminRefreshToken = signRefreshToken(adminPayload)
-    adminSessionCookie = `refreshToken=${adminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
-    nonAdminToken = signAccessToken(nonAdminPayload)
+    const { token: adToken, session: adSession } = await generateTokens('admin')
+    adminToken = adToken
+    adminSessionCookie = adSession
+
+    const { token: stToken } = await generateTokens('staff')
+    nonAdminToken = stToken
   })
 
   describe('Post /auth/register', () => {

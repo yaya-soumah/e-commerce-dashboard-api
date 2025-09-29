@@ -1,36 +1,21 @@
 import request from 'supertest'
 
 import app from '../../../app'
-import { User, Role, Permission } from '../../../models'
+import { Role, Permission } from '../../../models'
 import { signRefreshToken, signAccessToken } from '../../../utils/jwt.util'
-import { parse } from '../../../utils/bcrypt.util'
+import { generateTokens } from '../../utils/loader'
 
 import { defaultPermissions } from './roles.factory'
 
 describe('Roles API', () => {
   let adminToken: string
-  let refreshToken: string
   let sessionCookie: string
 
   beforeAll(async () => {
-    //seed to create an admin
-    const [adminRole] = await Role.findOrCreate({ where: { name: 'admin' } })
-    const [adminUser] = await User.findOrCreate({
-      where: {
-        name: 'admin',
-      },
-      defaults: {
-        name: 'Admin',
-        email: 'admin@example.com',
-        roleId: adminRole.id,
-        password: await parse('Password123'),
-      },
-    })
+    const { token: adToken, session: adSession } = await generateTokens('admin')
 
-    const payload = { userId: adminUser.id, email: adminUser.email, roleName: adminRole.name }
-    adminToken = signAccessToken(payload)
-    refreshToken = signRefreshToken(payload)
-    sessionCookie = `refreshToken=${refreshToken}; HttpOnly; Secure=false; SameSite=strict`
+    adminToken = adToken
+    sessionCookie = adSession
   })
 
   describe('Post /api/v1/roles', () => {

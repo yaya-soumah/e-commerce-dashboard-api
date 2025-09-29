@@ -1,38 +1,20 @@
 import request from 'supertest'
 
 import app from '../../../app'
-import { User, Role, Permission } from '../../../models'
-import { signRefreshToken, signAccessToken } from '../../../utils/jwt.util'
-import { parse } from '../../../utils/bcrypt.util'
+import { Permission } from '../../../models'
+import { generateTokens } from '../../utils/loader'
 
 describe('permissions API', () => {
   let adminToken: string
-  let refreshToken: string
   let sessionCookie: string
 
   beforeAll(async () => {
     //seed to create an admin
-    const [adminRole] = await Role.findOrCreate({ where: { name: 'admin' } })
-    const [adminUser] = await User.findOrCreate({
-      where: {
-        name: 'admin',
-      },
-      defaults: {
-        name: 'Admin',
-        email: 'admin@example.com',
-        roleId: adminRole.id,
-        password: await parse('Password123'),
-      },
-    })
 
-    const payload = {
-      userId: adminUser.id,
-      email: adminUser.email,
-      roleName: adminRole.name,
-    }
-    adminToken = signAccessToken(payload)
-    refreshToken = signRefreshToken(payload)
-    sessionCookie = `refreshToken=${refreshToken}; HttpOnly; Secure=false; SameSite=strict`
+    const { token, session } = await generateTokens('admin')
+
+    adminToken = token
+    sessionCookie = session
   })
 
   describe('Post /api/v1/permissions', () => {
@@ -51,15 +33,12 @@ describe('permissions API', () => {
       expect(res.body.data.description).toBe('A test permission')
     })
     it('Should throw error for non admin role', async () => {
-      const nonAdminPayload = { userId: 3, email: 'non-admin@example.com', roleName: 'staff' }
-      const nonAdminToken = signAccessToken(nonAdminPayload)
-      const nonAdminRefreshToken = signRefreshToken(nonAdminPayload)
-      const nonAdminSessionCookie = `refreshToken=${nonAdminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
+      const { token, session } = await generateTokens('staff')
 
       const res = await request(app)
         .post('/api/v1/permissions')
-        .set('Authorization', `Bearer ${nonAdminToken}`)
-        .set('Cookie', [nonAdminSessionCookie])
+        .set('Authorization', `Bearer ${token}`)
+        .set('Cookie', [session])
         .send({
           key: 'testPermission',
           description: 'A test permission',

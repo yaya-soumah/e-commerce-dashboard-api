@@ -1,20 +1,16 @@
 import request from 'supertest'
 
 import app from '../../../app'
-import { User, Role, Permission, Product, Category } from '../../../models'
-import { signRefreshToken, signAccessToken } from '../../../utils/jwt.util'
-import { parse } from '../../../utils/bcrypt.util'
+import { Permission, Product, Category } from '../../../models'
 import { generateSlug } from '../../../utils/slag'
+import { generateTokens } from '../../utils/loader'
 
 describe('Product Component', () => {
   let adminToken: string
-  let adminRefreshToken: string
   let adminSessionCookie: string
   let staffToken: string
-  let staffRefreshToken: string
   let staffSessionCookie: string
   let analystToken: string
-  let analystRefreshToken: string
   let analystSessionCookie: string
   let categoryId: number
 
@@ -30,10 +26,28 @@ describe('Product Component', () => {
       await Permission.create(perm)
     }
 
-    // Seed roles
-    const [adminRole] = await Role.findOrCreate({ where: { name: 'admin' } })
-    const staffRole = await Role.create({ name: 'staff' })
-    const analystRole = await Role.create({ name: 'analyst' })
+    let {
+      token: adToken,
+      session: adSessionCookies,
+      role: adminRole,
+    } = await generateTokens('admin')
+    let {
+      token: stToken,
+      session: stSessionCookies,
+      role: staffRole,
+    } = await generateTokens('staff')
+    let {
+      token: anToken,
+      session: anSessionCookies,
+      role: analystRole,
+    } = await generateTokens('analyst')
+
+    adminToken = adToken
+    adminSessionCookie = adSessionCookies
+    staffToken = stToken
+    staffSessionCookie = stSessionCookies
+    analystToken = anToken
+    analystSessionCookie = anSessionCookies
 
     await adminRole.$set('permissions', await Permission.findAll())
     await staffRole.$set(
@@ -46,65 +60,6 @@ describe('Product Component', () => {
       'permissions',
       await Permission.findAll({ where: { key: ['product:view'] } }),
     )
-
-    // Seed users
-    const adminUser = await User.create({
-      name: 'admin2',
-      email: 'admin2@example.com',
-      password: await parse('Admin1234'),
-      roleId: adminRole.id,
-    })
-    const staffUser = await User.create({
-      name: 'staff',
-      email: 'staff@example.com',
-      password: await parse('Staff1234'),
-      roleId: staffRole.id,
-    })
-    const analystUser = await User.create({
-      name: 'analyst',
-      email: 'analyst@example.com',
-      password: await parse('Analyst1234'),
-      roleId: analystRole.id,
-    })
-
-    //admin token
-    adminToken = signAccessToken({
-      userId: adminUser.id,
-      email: adminUser.email,
-      roleName: 'admin',
-    })
-    adminRefreshToken = signRefreshToken({
-      userId: adminUser.id,
-      email: adminUser.email,
-      roleName: 'admin',
-    })
-    adminSessionCookie = `refreshToken=${adminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
-
-    //staff token
-    staffToken = signAccessToken({
-      userId: staffUser.id,
-      email: staffUser.email,
-      roleName: 'staff',
-    })
-    staffRefreshToken = signRefreshToken({
-      userId: staffUser.id,
-      email: staffUser.email,
-      roleName: 'staff',
-    })
-    staffSessionCookie = `refreshToken=${staffRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
-
-    //analyst token
-    analystToken = signAccessToken({
-      userId: analystUser.id,
-      email: analystUser.email,
-      roleName: 'analyst',
-    })
-    analystRefreshToken = signRefreshToken({
-      userId: analystUser.id,
-      email: analystUser.email,
-      roleName: 'analyst',
-    })
-    analystSessionCookie = `refreshToken=${analystRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
 
     // Seed category with parent
     const parentCategory = await Category.create({
