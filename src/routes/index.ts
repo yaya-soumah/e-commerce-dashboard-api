@@ -5,6 +5,7 @@ import roleRouter from '../components/roles/roles.routes'
 import permissionsRouter from '../components/permissions/permissions.routes'
 import userRouter from '../components/users/user.routes'
 import productRouter from '../components/products/product.routes'
+import inventoryRouter from '../components/inventories/inventory.routes'
 const router = Router()
 
 router.use('/auth', authRouter)
@@ -13,5 +14,6 @@ router.use('/users', userRouter)
 router.use('/roles', roleRouter)
 router.use('/permissions', permissionsRouter)
 router.use('/products', productRouter)
+router.use('/inventory', inventoryRouter)
 
 export default router
