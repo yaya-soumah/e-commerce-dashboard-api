@@ -10,6 +10,8 @@ const router = Router()
 
 router.use(authenticateToken)
 
+router.get('/history', authorizeRole('admin'), InventoryController.getHistoryHandler)
+
 router.get('/', InventoryController.getAll)
 router.get('/:productId', InventoryController.getProductHandler)
 router.patch(
@@ -24,6 +26,5 @@ router.patch(
   authorizeRole('admin', 'staff'),
   InventoryController.decrementStockHandler,
 )
-router.get('/history', authorizeRole('admin'), InventoryController.getHistoryHandler)
 
 export default router

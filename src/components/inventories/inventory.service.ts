@@ -61,7 +61,7 @@ export class InventoryService {
     }
   }
 
-  // get history
+  // get all inventories
   static async getAll(query: any) {
     const {
       offset,

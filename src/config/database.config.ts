@@ -37,7 +37,7 @@ if (env === 'development') {
       },
     },
     models: [],
-    logging: false,
+    logging: true, //change to false for production
   })
 } else {
   throw new Error(`Unknown NODE_ENV: ${env}`)
