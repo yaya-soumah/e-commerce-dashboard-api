@@ -6,64 +6,66 @@ import { InventoryService } from './inventory.service'
 
 export class InventoryController {
   static async getAll(req: Request, res: Response, next: NextFunction) {
-    try {
-      const query = req.query
-      const inventories = await InventoryService.getAll(query)
-      success(res, 200, inventories, 'Operation successful')
-    } catch (err) {
-      next(err)
-    }
+    InventoryController.handleRequest(async () => InventoryService.getAll(req.query), res, next)
   }
 
   static async getProductHandler(req: Request, res: Response, next: NextFunction) {
-    try {
-      const productId = req.params.productId
-      const product = await InventoryService.getByProductId(Number(productId))
-      success(res, 200, product, 'Operation successful')
-    } catch (err) {
-      next(err)
-    }
+    InventoryController.handleRequest(
+      async () => InventoryService.getByProductId(Number(req.params.productId)),
+      res,
+      next,
+    )
   }
 
   static async restockHandler(req: Request, res: Response, next: NextFunction) {
-    try {
-      const productId = req.params.productId
-      const { quantity, reason } = req.body
-      const userId = (req as any).user.userId
-      const inventory = await InventoryService.restock({
-        productId: Number(productId),
-        quantity: Number(quantity),
-        reason,
-        userId,
-      })
-      success(res, 200, inventory, 'Operation successful')
-    } catch (err) {
-      next(err)
-    }
+    const { quantity, reason } = req.body
+    const userId = (req as any).user.userId
+    InventoryController.handleRequest(
+      async () =>
+        InventoryService.restock({
+          productId: Number(req.params.productId),
+          quantity: Number(quantity),
+          reason,
+          userId,
+        }),
+      res,
+      next,
+    )
   }
+
   static async decrementStockHandler(req: Request, res: Response, next: NextFunction) {
-    try {
-      const productId = req.params.productId
-      const { quantity, reason } = req.body
-      const userId = (req as any).user.userId
-      const inventory = await InventoryService.decrement({
-        productId: Number(productId),
-        quantity: Number(quantity),
-        reason,
-        userId,
-      })
-      success(res, 200, inventory, 'Operation successful')
-    } catch (err) {
-      next(err)
-    }
+    const { quantity, reason } = req.body
+    const userId = (req as any).user.userId
+    InventoryController.handleRequest(
+      async () =>
+        InventoryService.decrement({
+          productId: Number(req.params.productId),
+          quantity: Number(quantity),
+          reason,
+          userId,
+        }),
+      res,
+      next,
+    )
   }
 
   static async getHistoryHandler(req: Request, res: Response, next: NextFunction) {
+    const userId = (req as any).user.userId
+    InventoryController.handleRequest(
+      async () => InventoryService.getHistories(req.query, Number(userId)),
+      res,
+      next,
+    )
+  }
+
+  private static async handleRequest(
+    serviceCall: () => Promise<any>,
+    res: Response,
+    next: NextFunction,
+  ) {
     try {
-      const query = req.query
-      const userId = (req as any).user.userId
-      const histories = await InventoryService.getHistories(query, Number(userId))
-      success(res, 200, histories, 'Operation successful')
+      const result = await serviceCall()
+      success(res, 200, result, 'Operation successful')
     } catch (err) {
       next(err)
     }
