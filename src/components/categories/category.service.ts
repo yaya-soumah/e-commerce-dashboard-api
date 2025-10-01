@@ -5,7 +5,7 @@ import { CategoryRepository } from './category.repository'
 import { CategoryType } from './category.types'
 export class CategoryService {
   //get all categories
-  static async getAllCategories(tree: false) {
+  static async getAllCategories(tree: boolean) {
     return await CategoryRepository.findAll(tree)
   }
 
