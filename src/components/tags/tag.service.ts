@@ -1,10 +1,24 @@
 import { AppError } from '../../utils/app-error.util'
+import { parseQuery } from '../../utils/pagination'
 
 import { TagRepository } from './tag.repository'
 
 export class TagService {
-  static async getAllTags() {
-    return TagRepository.findAll()
+  static async getAllTags(query: any) {
+    const {
+      page,
+      offset,
+      limit,
+      search: { name },
+    } = await parseQuery(query)
+    const { rows, count } = await TagRepository.findAll({ offset, limit, name })
+    return {
+      tags: rows,
+      page,
+      limit,
+      total: count,
+      totalPage: Math.ceil(limit / count),
+    }
   }
 
   static async getTag(id: number) {

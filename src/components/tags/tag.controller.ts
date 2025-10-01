@@ -7,7 +7,7 @@ import { TagService } from './tag.service'
 export class TagController {
   static async listHandler(req: Request, res: Response, next: NextFunction) {
     try {
-      const tags = await TagService.getAllTags()
+      const tags = await TagService.getAllTags(req.query)
       success(res, 200, tags)
     } catch (err) {
       next(err)

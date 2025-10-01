@@ -1,3 +1,5 @@
+import { Op } from 'sequelize'
+
 import { Product, Tag } from '../../models'
 
 export class TagRepository {
@@ -9,9 +11,13 @@ export class TagRepository {
   }
 
   //find a list of all tags
-  static async findAll() {
-    return Tag.findAll({
+  static async findAll({ offset, limit, name }: { offset: number; limit: number; name: string }) {
+    return Tag.findAndCountAll({
+      where: { name: { [Op.like]: `%${name}%` } },
       include: [{ model: Product, as: 'products' }],
+      limit,
+      offset,
+      order: [['name', 'ASC']],
     })
   }
 
