@@ -32,7 +32,7 @@ export class CategoryRepository {
   // Update a category
   static async update(id: number, data: Partial<CategoryType>) {
     await Category.update(data, { where: { id } })
-    return this.findById(id)
+    return await this.findById(id)
   }
 
   // Delete a category
