@@ -1,10 +1,6 @@
 import { Category } from '../../models'
 
-interface CreateData {
-  name: string
-  parentId?: number
-  description?: string
-}
+import { CategoryType } from './category.types'
 
 export class CategoryRepository {
   // Get all categories, optionally as a tree
@@ -25,13 +21,13 @@ export class CategoryRepository {
   }
 
   // Create a category
-  static async create(data: CreateData) {
+  static async create(data: CategoryType) {
     const category = await Category.create(data)
     return this.findById(category.id)
   }
 
   // Update a category
-  static async update(id: number, data: Partial<CreateData>) {
+  static async update(id: number, data: Partial<CategoryType>) {
     await Category.update(data, { where: { id } })
     return this.findById(id)
   }
