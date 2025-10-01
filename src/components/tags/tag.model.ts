@@ -10,7 +10,7 @@ interface TagDataType {
   slug: string
 }
 
-type TagCreationDataType = Optional<TagDataType, 'id'>
+type TagCreationDataType = Optional<TagDataType, 'id' | 'slug'>
 
 @Table({ tableName: 'ecommerce_tags', timestamps: true })
 export class Tag extends Model<TagDataType, TagCreationDataType> {
