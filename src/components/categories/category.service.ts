@@ -24,6 +24,9 @@ export class CategoryService {
       const existingParent = await CategoryRepository.findById(data.parentId as number)
       if (!existingParent) throw new AppError('Wrong Parent id', 400)
     }
+    //name must be unique
+    const existingCategory = await CategoryRepository.findByName(data.name)
+    if (existingCategory) throw new AppError('This name already exists', 400)
     return await CategoryRepository.create(data)
   }
 

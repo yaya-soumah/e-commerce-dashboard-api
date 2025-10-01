@@ -3,6 +3,9 @@ import { Category } from '../../models'
 import { CategoryType } from './category.types'
 
 export class CategoryRepository {
+  static async findByName(name: string) {
+    return await Category.findOne({ where: { name } })
+  }
   // Get all categories, optionally as a tree
   static async findAll(tree = false) {
     return tree
