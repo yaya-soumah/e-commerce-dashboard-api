@@ -1,14 +1,18 @@
-import { Tag } from '../../models'
+import { Product, Tag } from '../../models'
 
 export class TagRepository {
   //retrieve a tag by id
   static async findById(id: number) {
-    return Tag.findByPk(id)
+    return Tag.findByPk(id, {
+      include: [{ model: Product, as: 'products' }],
+    })
   }
 
   //find a list of all tags
   static async findAll() {
-    return Tag.findAll()
+    return Tag.findAll({
+      include: [{ model: Product, as: 'products' }],
+    })
   }
 
   //create a tag
