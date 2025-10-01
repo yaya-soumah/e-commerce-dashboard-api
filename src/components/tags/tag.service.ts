@@ -26,6 +26,9 @@ export class TagService {
   }
 
   static async createTag(name: string) {
+    'check uniqueness of a tag'
+    const existingTag = await TagRepository.findByName(name)
+    if (existingTag) throw new AppError('name already exists')
     return TagRepository.create(name)
   }
 

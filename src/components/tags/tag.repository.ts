@@ -10,6 +10,11 @@ export class TagRepository {
     })
   }
 
+  //retrieve a tag by name
+  static async findByName(name: string) {
+    return Tag.findOne({ where: { name }, include: [{ model: Product, as: 'products' }] })
+  }
+
   //find a list of all tags
   static async findAll({ offset, limit, name }: { offset: number; limit: number; name: string }) {
     return Tag.findAndCountAll({
