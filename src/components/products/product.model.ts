@@ -11,7 +11,7 @@ import {
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Category, ProductTag, ProductImage, Tag, Inventory } from '../../models'
+import { Category, ProductTag, ProductImage, Tag, Inventory, OrderItem } from '../../models'
 import { generateSlug } from '../../utils/slag'
 
 import { ProductDataType } from './product.types'
@@ -82,4 +82,7 @@ export class Product extends Model<ProductDataType, ProductCreationDataType> {
 
   @HasOne(() => Inventory, 'productId')
   inventory?: number
+
+  @HasMany(() => OrderItem, 'productId')
+  products?: OrderItem[]
 }

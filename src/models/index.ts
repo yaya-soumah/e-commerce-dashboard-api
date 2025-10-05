@@ -9,6 +9,8 @@ import { ProductImage } from '../components/products/productImage.model'
 import { Tag } from '../components/tags/tag.model'
 import { Inventory } from '../components/inventories/inventory.model'
 import { InventoryHistory } from '../components/inventories/inventoryHistory.model'
+import { Order } from '../components/orders/order.model'
+import { OrderItem } from '../components/orders/orderItem.model'
 
 export const models = [
   User,
@@ -22,6 +24,8 @@ export const models = [
   Tag,
   Inventory,
   InventoryHistory,
+  Order,
+  OrderItem,
 ]
 
 export {
@@ -36,4 +40,6 @@ export {
   Tag,
   Inventory,
   InventoryHistory,
+  Order,
+  OrderItem,
 }

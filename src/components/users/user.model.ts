@@ -12,7 +12,7 @@ import {
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { Role, InventoryHistory } from '../../models'
+import { Role, InventoryHistory, Order } from '../../models'
 
 export enum UserRole {
   ADMIN = 'admin',
@@ -71,4 +71,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
 
   @HasMany(() => InventoryHistory, 'userId')
   inventory?: InventoryHistory
+
+  @HasMany(() => Order, 'userId')
+  orders?: Order[]
 }

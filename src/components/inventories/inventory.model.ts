@@ -4,13 +4,6 @@ import { Optional } from 'sequelize'
 import { Product } from '../../models'
 
 import { InventoryDataType } from './inventory.type'
-// interface InventoryDataType {
-//   id: number
-//   productId: number
-//   stock: number
-//   lowStockLevel?: number
-//   lastRestockedAt?: Date
-// }
 
 type InventoryCreateDataType = Optional<
   InventoryDataType,
