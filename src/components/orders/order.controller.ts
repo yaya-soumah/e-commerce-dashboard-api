@@ -15,7 +15,7 @@ export class OrderController {
     }
   }
 
-  static async ListOrder(req: Request, res: Response, next: NextFunction) {
+  static async listOrder(req: Request, res: Response, next: NextFunction) {
     try {
       const query = req.query
       const orders = await OrderService.getAllOrders(query)

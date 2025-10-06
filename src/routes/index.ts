@@ -8,6 +8,7 @@ import productRouter from '../components/products/product.routes'
 import inventoryRouter from '../components/inventories/inventory.routes'
 import categoryRouter from '../components/categories/category.routes'
 import tagRouter from '../components/tags/tag.routes'
+import orderRouter from '../components/orders/order.routes'
 
 const router = Router()
 
@@ -20,5 +21,6 @@ router.use('/products', productRouter)
 router.use('/inventory', inventoryRouter)
 router.use('/categories', categoryRouter)
 router.use('/tags', tagRouter)
+router.use('/orders', orderRouter)
 
 export default router
