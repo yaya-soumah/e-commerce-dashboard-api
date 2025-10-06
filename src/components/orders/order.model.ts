@@ -28,6 +28,9 @@ export class Order extends Model<OrderType, OrderCreate> {
   })
   declare orderNumber: string
 
+  @Column({ type: DataType.STRING, allowNull: false })
+  declare customerName: string
+
   @ForeignKey(() => User)
   @Column({
     type: DataType.NUMBER,

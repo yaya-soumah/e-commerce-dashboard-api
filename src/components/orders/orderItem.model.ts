@@ -5,13 +5,13 @@ import { Order, Product } from '../../models/index'
 
 import { OrderItemType } from './order-item.types'
 
-type OrderCreate = Optional<OrderItemType, 'id'>
+type OrderItemCreate = Optional<OrderItemType, 'id'>
 
 @Table({
   tableName: 'ecommerce_order_items',
   timestamps: true,
 })
-export class OrderItem extends Model<OrderItemType, OrderCreate> {
+export class OrderItem extends Model<OrderItemType, OrderItemCreate> {
   @ForeignKey(() => Order)
   @Column({
     type: DataType.NUMBER,
