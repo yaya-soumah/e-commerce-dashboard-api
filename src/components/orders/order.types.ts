@@ -17,11 +17,9 @@ export interface OrderCreate {
   items: { productId: number; quantity: number }[]
   shippingAddress: string
   notes?: string
-  userId: number
 }
 
 export interface OrderUpdate {
-  userId: number
   notes?: string
   status?: 'pending' | 'processing' | 'shipped' | 'completed' | 'cancelled'
   paymentStatus?: 'unpaid' | 'paid' | 'refunded' | 'failed'

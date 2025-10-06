@@ -38,7 +38,11 @@ export class OrderRepository {
     return await Order.findAndCountAll({ where, offset, limit, order: [['createdAt', 'DESC']] })
   }
 
-  static async create(data: OrderCreate) {
+  static async create(
+    data: OrderCreate & {
+      userId: number
+    },
+  ) {
     const transaction = await sequelize.transaction()
     try {
       const subtotal = await this.calculateSubtotal(data.items, transaction)
@@ -122,7 +126,8 @@ export class OrderRepository {
   }
 
   //update order
-  static async update(id: number, data: OrderUpdate) {
+
+  static async update(id: number, data: OrderUpdate & { userId: number }) {
     const transaction = await sequelize.transaction()
     try {
       const { userId, ...updateData } = data
