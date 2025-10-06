@@ -53,10 +53,16 @@ export class OrderRepository {
       const customer = await User.findOne({ where: { name: data.customerName } })
       if (!customer) throw new AppError('Customer not found', 404)
 
+      //avoid duplicate order number
+      const orderNumber = generateOrderNumber()
+      const existingOrder = await Order.findOne({ where: { orderNumber } })
+      if (existingOrder !== null) {
+        throw new AppError('Something went wrong. Please retry again', 400)
+      }
       // create order
       const order = await Order.create(
         {
-          orderNumber: generateOrderNumber(),
+          orderNumber,
           customerName: customer.id,
           subtotal,
           tax,
