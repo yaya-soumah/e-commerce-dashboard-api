@@ -16,6 +16,7 @@ export const UpdateOrderSchema = z.object({
   notes: z.string().optional(),
   status: z.enum(['pending', 'processing', 'shipped', 'completed', 'cancelled']).optional(),
   paymentStatus: z.enum(['unpaid', 'paid', 'refunded', 'failed']).optional(),
+  shippingAddress: z.string().optional(),
 })
 
 export const FilterOrderSchema = z.object({

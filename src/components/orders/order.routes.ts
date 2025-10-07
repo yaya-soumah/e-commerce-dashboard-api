@@ -20,7 +20,7 @@ router.post(
   OrderController.createOrder,
 )
 router.post(
-  '/item',
+  '/item/:id',
   authorizeRole('admin', 'staff'),
   validate(CreateOrderItemSchema),
   OrderController.addOrderItem,

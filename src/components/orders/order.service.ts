@@ -44,7 +44,7 @@ export class OrderService {
   static async deleteOrder(id: number, userId: number) {
     return await OrderRepository.delete(id, userId)
   }
-  static async createOrderItem(data: OrderItemCreate) {
-    return await OrderRepository.createItem(data)
+  static async AddOrderItem(data: OrderItemCreate) {
+    return await OrderRepository.addItem(data)
   }
 }
