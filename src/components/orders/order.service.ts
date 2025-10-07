@@ -23,6 +23,7 @@ export class OrderService {
       dateTo,
       customerName,
     })
+    console.log('service hits**************', JSON.stringify(rows))
 
     return {
       orders: rows,

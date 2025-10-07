@@ -19,6 +19,8 @@ export class OrderController {
     try {
       const query = req.query
       const orders = await OrderService.getAllOrders(query)
+      console.log('ctrl hits**************', JSON.stringify(orders))
+
       success(res, 200, orders, 'Operation successfully')
     } catch (err) {
       next(err)

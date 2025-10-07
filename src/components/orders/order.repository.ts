@@ -20,7 +20,7 @@ export class OrderRepository {
   static async findAll(filter: OrderFilter) {
     const { status, dateFrom, dateTo, customerName, offset, limit } = filter
     const where: Record<string, any> = {}
-
+    console.log('repo hits**************')
     if (status) {
       where.status = status
     }
