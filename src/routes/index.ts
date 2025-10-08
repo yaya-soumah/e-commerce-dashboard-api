@@ -9,6 +9,7 @@ import inventoryRouter from '../components/inventories/inventory.routes'
 import categoryRouter from '../components/categories/category.routes'
 import tagRouter from '../components/tags/tag.routes'
 import orderRouter from '../components/orders/order.routes'
+import paymentRouter from '../components/payments/payment.routes'
 
 const router = Router()
 
@@ -22,5 +23,6 @@ router.use('/inventory', inventoryRouter)
 router.use('/categories', categoryRouter)
 router.use('/tags', tagRouter)
 router.use('/orders', orderRouter)
+router.use('/payments', paymentRouter)
 
 export default router
