@@ -9,7 +9,7 @@ interface PaymentType {
   method: 'cash' | 'credit_card' | 'bank_transfer' | 'manual'
   paidAt: Date
   amount: number
-  notes?: number
+  notes?: string
 }
 
 type PaymentTypeCreate = Optional<PaymentType, 'id'>
