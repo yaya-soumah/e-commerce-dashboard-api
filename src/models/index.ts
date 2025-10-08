@@ -11,6 +11,7 @@ import { Inventory } from '../components/inventories/inventory.model'
 import { InventoryHistory } from '../components/inventories/inventoryHistory.model'
 import { Order } from '../components/orders/order.model'
 import { OrderItem } from '../components/orders/orderItem.model'
+import { Payment } from '../components/payments/payment.model'
 
 export const models = [
   User,
@@ -26,6 +27,7 @@ export const models = [
   InventoryHistory,
   Order,
   OrderItem,
+  Payment,
 ]
 
 export {
@@ -42,4 +44,5 @@ export {
   InventoryHistory,
   Order,
   OrderItem,
+  Payment,
 }

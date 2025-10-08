@@ -6,10 +6,12 @@ import {
   DataType,
   HasMany,
   ForeignKey,
+  AfterCreate,
+  AfterUpdate,
 } from 'sequelize-typescript'
 import { Optional } from 'sequelize'
 
-import { User, OrderItem } from '../../models'
+import { User, OrderItem, Payment } from '../../models'
 import { generateOrderNumber } from '../../utils/orderNumber'
 
 import { OrderType } from './order.types'
@@ -87,4 +89,19 @@ export class Order extends Model<OrderType, OrderCreate> {
 
   @HasMany(() => OrderItem, 'orderId')
   items?: OrderItem[]
+
+  @HasMany(() => Payment, 'orderId')
+  payments?: Payment[]
+
+  @AfterCreate
+  @AfterUpdate
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  static async syncPaymentStatus(instance: Order, options: any) {
+    if (instance.changed('paymentStatus')) {
+      const payment = await Payment.findOne({ where: { orderId: instance.id } })
+      if (payment) {
+        await payment.update({ status: instance.paymentStatus })
+      }
+    }
+  }
 }
