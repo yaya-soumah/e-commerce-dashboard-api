@@ -11,7 +11,7 @@ const router = Router()
 
 router.use(authenticateToken)
 
-router.get('/', authorizeRole('payment:view'), PaymentController.listHandler)
+router.get('/', PaymentController.listHandler)
 
 router.get(
   '/:id',

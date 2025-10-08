@@ -31,7 +31,7 @@ export class PaymentController {
         status: req.body.status,
         method: req.body.method,
         transactionId: req.body.transactionId,
-        paidAt: req.body.paidAt,
+        paidAt: new Date(req.body.paidAt || new Date().toISOString()),
         amount: req.body.amount,
         notes: req.body.notes,
       })

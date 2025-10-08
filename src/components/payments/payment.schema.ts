@@ -8,7 +8,7 @@ export const PaymentCreateSchema = z.object({
     error: 'Invalid payment status',
   }),
   transactionId: z.string().optional(),
-  paidAt: z.date(),
+  paidAt: z.string().optional(),
   amount: z.number(),
   notes: z.string().optional(),
 })
@@ -21,7 +21,7 @@ export const PaymentUpdateSchema = z.object({
     .enum(['cash', 'credit_card', 'bank_transfer', 'manual'], { error: 'Invalid payment status' })
     .optional(),
   transactionId: z.string().optional(),
-  paidAt: z.date().optional(),
+  paidAt: z.string().optional(),
   amount: z.number().optional(),
   notes: z.string().optional(),
 })

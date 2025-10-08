@@ -24,29 +24,19 @@ export class PaymentRepository {
       where.createdAt = { ...(where.createdAt || {}), [Op.lte]: new Date(dateTo) }
     }
 
-    try {
-      return await Payment.findAndCountAll({
-        where,
-        include: [{ model: Order, as: 'Order' }],
-        limit,
-        offset,
-        order: [['createdAt', 'DESC']],
-      })
-    } catch (err) {
-      console.error('err:', err)
-      throw new AppError('Fail to get the list', 500)
-    }
+    return await Payment.findAndCountAll({
+      where,
+      include: [{ model: Order, as: 'order' }],
+      limit,
+      offset,
+      order: [['createdAt', 'DESC']],
+    })
   }
 
   static async getPaymentById(id: number) {
-    try {
-      return await Payment.findByPk(id, {
-        include: [{ model: Order, as: 'Order' }],
-      })
-    } catch (err) {
-      console.log('err:', err)
-      throw new AppError('Fail to retrieve payment', 500)
-    }
+    return await Payment.findByPk(id, {
+      include: [{ model: Order, as: 'order' }],
+    })
   }
 
   static async createPayment(data: PaymentCreate) {
@@ -79,12 +69,11 @@ export class PaymentRepository {
 
       await transaction.commit()
       return await Payment.findByPk(payment.id, {
-        include: [{ model: Order, as: 'Order' }],
+        include: [{ model: Order, as: 'order' }],
       })
     } catch (err) {
-      console.error('err:', err)
       await transaction.rollback()
-      throw new AppError('Fail to create payment', 500)
+      throw err
     }
   }
 
@@ -121,7 +110,7 @@ export class PaymentRepository {
 
       await transaction.commit()
       return await Payment.findByPk(id, {
-        include: [{ model: Order, as: 'Order' }],
+        include: [{ model: Order, as: 'order' }],
       })
     } catch (error) {
       await transaction.rollback()
@@ -146,10 +135,9 @@ export class PaymentRepository {
       await order?.update({ paymentStatus: 'unpaid' }, { transaction })
 
       await transaction.commit()
-    } catch (error) {
-      console.log('err:', error)
+    } catch (err) {
       await transaction.rollback()
-      throw new AppError('Failed to delete payment', 500)
+      throw err
     }
   }
 }
