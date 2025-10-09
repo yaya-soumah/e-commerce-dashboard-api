@@ -24,10 +24,10 @@ export class RolePermission extends Model<
   @AllowNull(false)
   @ForeignKey(() => Role)
   @Column(DataType.INTEGER)
-  roleId!: number
+  declare roleId: number
 
   @AllowNull(false)
   @ForeignKey(() => Permission)
   @Column(DataType.INTEGER)
-  permissionId!: number
+  declare permissionId: number
 }

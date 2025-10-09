@@ -1,5 +1,19 @@
-import { Role, Permission, User, Product, Inventory, Category, Tag, ProductImage } from '../models'
+import {
+  Role,
+  Permission,
+  User,
+  Product,
+  Inventory,
+  Category,
+  Tag,
+  ProductImage,
+  InventoryHistory,
+  Order,
+  OrderItem,
+  Payment,
+} from '../models'
 import { parse } from '../utils/bcrypt.util'
+import { generateOrderNumber } from '../utils/orderNumber'
 import { generateSlug } from '../utils/slag'
 
 const defaultPermissions = [
@@ -10,11 +24,15 @@ const defaultPermissions = [
   { key: 'product:create', description: 'Create products' },
   { key: 'product:update', description: 'Update products' },
   { key: 'product:delete', description: 'Delete products' },
-  { key: 'product:view', description: 'view products' },
+  { key: 'product:view', description: 'View products' },
   { key: 'order:create', description: 'Create orders' },
   { key: 'order:update', description: 'Update orders' },
   { key: 'order:delete', description: 'Delete orders' },
-  { key: 'order:view', description: 'view orders' },
+  { key: 'order:view', description: 'View orders' },
+  { key: 'payment:create', description: 'Create payments' },
+  { key: 'payment:update', description: 'Update payments' },
+  { key: 'payment:view', description: 'view payments' },
+  { key: 'payment:delete', description: 'Delete payments' },
   { key: 'dashboard:read', description: 'Read dashboard data' },
 ]
 
@@ -32,6 +50,11 @@ const defaultRoles = [
       'order:create',
       'order:update',
       'order:view',
+      'order:delete',
+      'payment:create',
+      'payment:update',
+      'payment:view',
+      'payment:delete',
       'dashboard:read',
     ],
   },
@@ -45,6 +68,9 @@ const defaultRoles = [
       'order:create',
       'order:update',
       'order:view',
+      'payment:create',
+      'payment:update',
+      'payment:view',
     ],
   },
   {
@@ -87,6 +113,7 @@ const defaultProducts = [
     price: 699.99,
     status: 'active',
     stock: 100,
+    lowStockLevel: 5,
     sku: 'SPX-001',
     categoryId: 1,
     tags: ['new', 'popular'],
@@ -99,10 +126,28 @@ const defaultProducts = [
     slug: generateSlug('T-Shirt Basic'),
     status: 'active',
     stock: 200,
+    lowStockLevel: 10,
     sku: 'TSB-001',
     categoryId: 3,
     tags: ['sale'],
     images: ['https://example.com/images/tshirt1.jpg'],
+  },
+]
+const defaultOrders = [
+  {
+    customerName: 'Alex',
+    items: [
+      { productName: 'Smartphones X', productId: 1, quantity: 1 },
+      { productName: 'T-Shirt Basic', productId: 2, quantity: 2 },
+    ],
+    shippingAddress: '#144 ChengYang, China',
+    notes: 'Gift wrap please',
+  },
+  {
+    customerName: 'Mr. Wang',
+    items: [{ productName: 'Smartphones X', productId: 1, quantity: 1 }],
+    shippingAddress: '#456 JiaoZhou, China',
+    notes: '',
   },
 ]
 
@@ -149,7 +194,7 @@ export const seedDatabase = async () => {
     const [staffRole] = await Role.findOrCreate({
       where: { name: 'staff' },
     })
-    await User.findOrCreate({
+    const [adminUser] = await User.findOrCreate({
       where: { name: 'staff' },
       defaults: {
         name: 'staff',
@@ -182,26 +227,102 @@ export const seedDatabase = async () => {
       tagList.push(tag)
     }
 
-    //seed product
+    //seed product and Inventory
 
     for (const prod of defaultProducts) {
-      const { images, tags, stock, ...rest } = prod
+      const { images, tags, stock, lowStockLevel, ...rest } = prod
       const [product] = await Product.findOrCreate({
         where: { name: rest.name },
         defaults: rest,
       })
-      await Inventory.create({ productId: product.id, stock: stock || 0 })
+      await Inventory.create({
+        productId: product.id,
+        stock: stock || 0,
+        lowStockLevel,
+        lastRestockedAt: new Date(),
+      })
 
+      //Seed inventory history
+      await InventoryHistory.findOrCreate({
+        where: {
+          productId: product.id,
+        },
+        defaults: {
+          productId: product.id,
+          change: prod.stock,
+          reason: 'Initial stock',
+          userId: adminUser.id,
+        },
+      })
       if (tags) {
         const ownTags = tagList.filter((item) => tags.includes(item.name))
         product.$set('tags', ownTags)
       }
       const imageList = images.map((img) => ({ url: img, productId: product.id }))
 
-      const relatedImages = await ProductImage.bulkCreate(imageList)
-      product.$set('images', relatedImages)
+      if (imageList.length !== 0) {
+        imageList.forEach(
+          async (item) =>
+            await ProductImage.findOrCreate({ where: item.productId, defaults: item }),
+        )
+      }
+      // const relatedImages = await ProductImage.bulkCreate(imageList)
+      // await product.$set('images', relatedImages)
 
       product.save()
+    }
+    //Seed orders
+    for (const orderData of defaultOrders) {
+      const [order] = await Order.findOrCreate({
+        where: { customerName: orderData.customerName },
+        defaults: {
+          customerName: orderData.customerName,
+          subtotal: 0,
+          tax: 0,
+          total: 0,
+          shippingAddress: orderData.shippingAddress,
+          notes: orderData.notes,
+          userId: adminUser.id,
+          status: 'pending',
+          paymentStatus: 'unpaid',
+          orderNumber: generateOrderNumber(),
+        },
+      })
+      for (const itemData of orderData.items) {
+        const product = await Product.findOne({ where: { name: itemData.productName } })
+        await OrderItem.findOrCreate({
+          where: {
+            orderId: order.id,
+          },
+          defaults: {
+            orderId: order.id,
+            productId: product?.id,
+            quantity: itemData.quantity,
+            unitPrice: product!.price,
+            totalPrice: product!.price * itemData.quantity,
+          },
+        })
+      }
+      //Recalculate totals
+      const items = await OrderItem.findAll({
+        where: { orderId: order.id },
+      })
+      const subtotal = Number(items.reduce((sum, item) => sum + item.totalPrice, 0))
+      const tax = subtotal * 0.1
+      const total = subtotal + tax
+      await order.update({ subtotal, tax, total })
+    }
+    //Seed payments
+    const [order] = await Order.findAll({ limit: 1 })
+    if (order) {
+      await Payment.create({
+        orderId: order.id,
+        status: 'paid',
+        method: 'credit_card',
+        paidAt: new Date(),
+        amount: order.total,
+        notes: 'Payment received via credit card',
+      })
     }
   } catch (error) {
     console.error('Failed to seed database', error)
