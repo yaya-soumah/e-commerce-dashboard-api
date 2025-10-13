@@ -2,16 +2,13 @@ import { Router } from 'express'
 
 import { authenticateToken } from '../../middleware/auth.middleware'
 import { authorizeRole } from '../../middleware/requireRole.middleware'
-import { validate } from '../../middleware/validate.middleware'
 
-import { FilterSchema } from './analytic.schema'
 import { AnalyticController } from './analytic.controller'
 
 const router = Router()
 
 router.use(authenticateToken)
-router.use(authorizeRole('admin', 'analytic'))
-router.use(validate(FilterSchema))
+router.use(authorizeRole('admin', 'analyst'))
 
 router.get('/overview', AnalyticController.overviewHandler)
 

@@ -10,12 +10,11 @@ export class AnalyticRepository {
   private static getOrderWhereClause(filter: AnalyticsFilter): WhereOptions {
     const { startDate, endDate } = filter
     const defaultStart = new Date(Date.now() - this.DEFAULT_DAYS * 24 * 60 * 60 * 1000)
-
     return {
       paymentStatus: 'paid', // Assuming this is correct for an "Order"
       createdAt: {
-        [Op.gte]: startDate ? new Date(startDate) : defaultStart,
-        [Op.lte]: endDate ? new Date(endDate) : new Date(),
+        [Op.gte]: startDate ? startDate : defaultStart,
+        [Op.lte]: endDate ? endDate : new Date(Date.now()),
       },
     }
   }
@@ -43,7 +42,6 @@ export class AnalyticRepository {
   static async getSalesOverview(filter: AnalyticsFilter): Promise<SalesOverviewResult> {
     const where = this.getOrderWhereClause(filter)
     const include = this.getCategoryIncludeClause(filter.categoryId)
-
     const [row] = await Order.findAll({
       where,
       include,
@@ -72,8 +70,9 @@ export class AnalyticRepository {
     }
   }
 
-  static async getTopSellingProducts(filter: AnalyticsFilter, limit = 10) {
-    const orderWhere = this.getOrderWhereClause(filter)
+  static async getTopSellingProducts(filter: AnalyticsFilter) {
+    const { limit, ...rest } = filter
+    const orderWhere = this.getOrderWhereClause(rest)
 
     const includes: Includeable[] = [
       {
@@ -114,10 +113,11 @@ export class AnalyticRepository {
     }))
   }
 
-  static async getSalesChart(filter: AnalyticsFilter, groupBy: 'day' | 'week' | 'month' = 'day') {
-    const where = this.getOrderWhereClause(filter)
+  static async getSalesChart(filter: AnalyticsFilter) {
+    const { groupBy, ...rest } = filter
+    const where = this.getOrderWhereClause(rest)
     const DATE_ALIAS = 'reportDate'
-    const groupFunc = fn('date_trunc', groupBy, col('createdAt'))
+    const groupFunc = fn('date', col('createdAt'))
     const groupClause = [groupFunc]
 
     const chartData = await Order.findAll({
@@ -136,6 +136,7 @@ export class AnalyticRepository {
       date: row[DATE_ALIAS],
       revenue: parseFloat(row.revenue || '0'),
       orderCount: parseInt(row.orderCount || '0', 10),
+      groupBy,
     }))
   }
 

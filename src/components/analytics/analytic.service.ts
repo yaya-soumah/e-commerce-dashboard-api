@@ -1,7 +1,3 @@
-import { StatusCodes } from 'http-status-codes'
-
-import { AppError } from '../../utils/app-error.util'
-
 import { AnalyticRepository } from './analytic.repository'
 import { AnalyticsFilter } from './analytic.types'
 
@@ -26,11 +22,11 @@ export class AnalyticService {
       await Promise.all([
         AnalyticRepository.getSalesOverview(filter),
         AnalyticRepository.getTopSellingProducts(filter),
-        AnalyticRepository.getSalesChart(filter, 'day'),
+        AnalyticRepository.getSalesChart(filter),
         AnalyticRepository.getOrderStatusDistribution(filter),
         AnalyticRepository.getPaymentMethodBreakdown(filter),
       ])
-
+    console.log('promises resolved')
     return {
       ...overview,
       topProducts,
@@ -44,15 +40,12 @@ export class AnalyticService {
     return await AnalyticRepository.getSalesOverview(filter)
   }
 
-  static async getTopSellingProducts(filter: AnalyticsFilter, limit = 10) {
-    return await AnalyticRepository.getTopSellingProducts(filter, limit)
+  static async getTopSellingProducts(filter: AnalyticsFilter) {
+    return await AnalyticRepository.getTopSellingProducts(filter)
   }
 
-  static async getChartData(filter: AnalyticsFilter, groupBy: 'day' | 'week' | 'month' = 'day') {
-    if (!['day', 'week', 'month'].includes(groupBy)) {
-      throw new AppError('Invalid groupBy value', StatusCodes.BAD_REQUEST)
-    }
-    return await AnalyticRepository.getSalesChart(filter, groupBy)
+  static async getChartData(filter: AnalyticsFilter) {
+    return await AnalyticRepository.getSalesChart(filter)
   }
 
   static async getStatusDistribution(filter: AnalyticsFilter) {
