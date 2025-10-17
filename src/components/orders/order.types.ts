@@ -10,6 +10,8 @@ export interface OrderType {
   paymentStatus: 'unpaid' | 'paid' | 'refunded' | 'failed'
   shippingAddress: string
   notes?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface OrderCreate {

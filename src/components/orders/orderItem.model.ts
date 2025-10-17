@@ -5,7 +5,7 @@ import { Order, Product } from '../../models/index'
 
 import { OrderItemType } from './order-item.types'
 
-type OrderItemCreate = Optional<OrderItemType, 'id'>
+type OrderItemCreate = Optional<OrderItemType, 'id' | 'createdAt' | 'updatedAt'>
 
 @Table({
   tableName: 'ecommerce_order_items',

@@ -5,6 +5,8 @@ export interface OrderItemType {
   quantity: number
   unitPrice: number
   totalPrice: number
+  createdAt?: Date
+  updatedAt?: Date
 }
 
 export interface OrderItemCreate {

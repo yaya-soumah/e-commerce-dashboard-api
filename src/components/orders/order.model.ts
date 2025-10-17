@@ -9,14 +9,14 @@ import {
   AfterCreate,
   AfterUpdate,
 } from 'sequelize-typescript'
-import { Optional } from 'sequelize'
+import type { Optional, CreationOptional } from 'sequelize'
 
 import { User, OrderItem, Payment } from '../../models'
 import { generateOrderNumber } from '../../utils/orderNumber'
 
 import { OrderType } from './order.types'
 
-type OrderCreate = Optional<OrderType, 'id'>
+type OrderCreate = Optional<OrderType, 'id' | 'createdAt' | 'updatedAt'>
 
 @Table({ tableName: 'ecommerce_orders', timestamps: true })
 export class Order extends Model<OrderType, OrderCreate> {
@@ -83,6 +83,12 @@ export class Order extends Model<OrderType, OrderCreate> {
     allowNull: false,
   })
   declare notes?: string
+
+  @Column(DataType.DATE)
+  declare createdAt: CreationOptional<Date> // Add this line
+
+  @Column(DataType.DATE)
+  declare updatedAt: CreationOptional<Date> // Add this line
 
   @BelongsTo(() => User, 'userId')
   createdBy?: User

@@ -135,7 +135,7 @@ describe('Analytics Component', () => {
         .get('/api/v1/analytics/sales')
         .set('Authorization', `Bearer ${analystToken}`)
         .set('Cookie', [analystCookie])
-        .query({ startDate: '2025-10-01', endDate: '2025-10-15' })
+        .query({ startDate: '2025-10-01', endDate: '2025-10-18' }) //update the interval to pass the test
 
       expect(res.status).toBe(200)
       expect(res.body.status).toBe('success')

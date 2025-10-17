@@ -3,6 +3,7 @@ export type InventoryDataType = {
   productId: number
   stock: number
   lowStockLevel?: number
+  stockThreshold?: number
   lastRestockedAt?: Date
 }
 

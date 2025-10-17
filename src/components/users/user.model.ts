@@ -28,9 +28,14 @@ interface UserAttributes {
   roleId: number
   status?: string
   avatar?: string
+  createdAt?: Date
+  updatedAt?: Date
 }
 
-type UserCreationAttributes = Optional<UserAttributes, 'id' | 'status' | 'avatar'>
+type UserCreationAttributes = Optional<
+  UserAttributes,
+  'id' | 'status' | 'avatar' | 'createdAt' | 'updatedAt'
+>
 export type { UserAttributes, UserCreationAttributes }
 
 @Table({

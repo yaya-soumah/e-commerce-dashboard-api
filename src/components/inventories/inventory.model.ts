@@ -41,6 +41,13 @@ export class Inventory extends Model<InventoryDataType, InventoryCreateDataType>
   declare lowStockLevel?: number
 
   @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    defaultValue: 10,
+  })
+  declare stockThreshold: number
+
+  @Column({
     type: DataType.DATE,
     allowNull: true,
   })
