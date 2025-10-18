@@ -39,26 +39,9 @@ export class PaymentRepository {
     })
   }
 
-  static async createPayment(data: PaymentCreate) {
+  static async createPayment(data: PaymentCreate, order: Order) {
     const transaction = await sequelize.transaction()
     try {
-      const order = await Order.findByPk(data.orderId, { transaction })
-      if (!order) {
-        throw new AppError('Order not found', 400)
-      }
-      if (order.paymentStatus !== 'unpaid') {
-        throw new AppError('Order already has a payment', 400)
-      }
-      if (order.status === 'cancelled') {
-        throw new AppError('Cannot pay for cancelled order', 400)
-      }
-      if (data.amount <= 0) {
-        throw new AppError('Amount must be greater than 0', 400)
-      }
-      if (data.status === 'paid' && !data.paidAt) {
-        throw new AppError('PaidAt is required for paid status', 400)
-      }
-
       const payment = await Payment.create(data, { transaction })
 
       // Sync order paymentStatus
@@ -77,22 +60,9 @@ export class PaymentRepository {
     }
   }
 
-  static async updatePayment(id: number, data: Partial<PaymentCreate>) {
+  static async updatePayment(id: number, data: Partial<PaymentCreate>, payment: Payment) {
     const transaction = await sequelize.transaction()
     try {
-      const payment = await Payment.findByPk(id, { transaction })
-      if (!payment) {
-        throw new AppError('Payment not found', 404)
-      }
-
-      if (data.amount !== undefined && data.amount <= 0) {
-        throw new AppError('Amount must be greater than 0', 400)
-      }
-
-      if (payment.status === 'paid' && data.amount !== undefined) {
-        throw new AppError('Cannot update amount for paid payment', 400)
-      }
-
       await payment.update(data, { transaction })
 
       // Sync order paymentStatus

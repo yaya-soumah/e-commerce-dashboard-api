@@ -83,7 +83,30 @@ describe('Payments Component', () => {
   })
 
   describe('POST /payments', () => {
-    it('should allow staff to create payment for order', async () => {
+    it('should allow admin to create payment for order', async () => {
+      const res = await request(app)
+        .post(`/api/v1/payments/${orderId}`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminCookie])
+        .send({
+          status: 'paid',
+          method: 'credit_card',
+          transactionId: 'TXN-001',
+          paidAt: new Date().toISOString(),
+          amount: 109.98,
+          notes: 'Payment received',
+        })
+
+      expect(res.status).toBe(201)
+      expect(res.body.status).toBe('success')
+      expect(res.body.data.status).toBe('paid')
+      expect(res.body.data.amount).toBe(109.98)
+
+      // Verify order paymentStatus synced
+      const updatedOrder = await Order.findByPk(orderId)
+      expect(updatedOrder?.paymentStatus).toBe('paid')
+    })
+    it('should not allow staff to create payment for order', async () => {
       const res = await request(app)
         .post(`/api/v1/payments/${orderId}`)
         .set('Authorization', `Bearer ${staffToken}`)
@@ -96,20 +119,16 @@ describe('Payments Component', () => {
           amount: 109.98,
           notes: 'Payment received',
         })
-      expect(res.status).toBe(201)
-      expect(res.body.status).toBe('success')
-      expect(res.body.data.status).toBe('paid')
-      expect(res.body.data.amount).toBe(109.98)
 
-      // Verify order paymentStatus synced
-      const updatedOrder = await Order.findByPk(orderId)
-      expect(updatedOrder?.paymentStatus).toBe('paid')
+      expect(res.status).toBe(403)
+      expect(res.body.message).toBe('Forbidden: insufficient permission')
     })
+
     it('should prevent duplicate payment for order', async () => {
       const res = await request(app)
         .post(`/api/v1/payments/${orderId}`)
-        .set('Authorization', `Bearer ${staffToken}`)
-        .set('Cookie', [staffCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminCookie])
         .send({
           status: 'paid',
           method: 'cash',
@@ -133,7 +152,7 @@ describe('Payments Component', () => {
         })
       expect(res.status).toBe(403)
       expect(res.body.status).toBe('error')
-      expect(res.body.message).toBe('Access denied: insufficient role')
+      expect(res.body.message).toBe('Forbidden: insufficient permission')
     })
 
     it('should validate payment creation', async () => {
@@ -207,8 +226,8 @@ describe('Payments Component', () => {
       //pay the order
       const paymentRes = await request(app)
         .post(`/api/v1/payments/${orderRes.body.data.id}`)
-        .set('Authorization', `Bearer ${staffToken}`)
-        .set('Cookie', [staffCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminCookie])
         .send({
           status: 'unpaid',
           method: 'credit_card',
@@ -217,6 +236,7 @@ describe('Payments Component', () => {
           amount: 109.98,
           notes: 'Payment received',
         })
+
       //cancel the order
       await request(app)
         .patch(`/api/v1/orders/${orderRes.body.data.id}`)
@@ -252,8 +272,8 @@ describe('Payments Component', () => {
       //pay the order
       const paymentRes = await request(app)
         .post(`/api/v1/payments/${orderRes.body.data.id}`)
-        .set('Authorization', `Bearer ${staffToken}`)
-        .set('Cookie', [staffCookie])
+        .set('Authorization', `Bearer ${adminToken}`)
+        .set('Cookie', [adminCookie])
         .send({
           status: 'paid',
           method: 'credit_card',

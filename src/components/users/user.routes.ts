@@ -16,17 +16,12 @@ const router = Router()
 router.use(authenticateToken)
 
 router.get('/', authorizeRole('admin'), UserController.userList)
-router.get('/me', authorizeRole('owner'), UserController.getCurrentUser)
-router.get('/:id', authorizeRole('admin', 'owner'), UserController.getUser)
-router.patch(
-  '/:id',
-  authorizeRole('admin', 'owner'),
-  validate(UpdateUserSchema),
-  UserController.updateUser,
-)
+router.get('/me', UserController.getCurrentUser)
+router.get('/:id', authorizeRole('owner'), UserController.getUser)
+router.patch('/:id', authorizeRole('owner'), validate(UpdateUserSchema), UserController.updateUser)
 router.patch(
   '/:id/password',
-  authorizeRole('admin', 'owner'),
+  authorizeRole('owner'),
   validate(ChangePasswordSchema),
   UserController.updatePassword,
 )

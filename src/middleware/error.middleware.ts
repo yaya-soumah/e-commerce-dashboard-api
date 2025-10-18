@@ -10,21 +10,21 @@ const errorHandler = (err: Error, req: Request, res: Response, next: NextFunctio
   logger.error(err.message)
 
   if (err instanceof AppError) {
-    return error(res, err.statusCode, err.message, err.errors)
+    error(res, err.statusCode, err.message, err.errors)
   }
 
   if (err instanceof ValidationError) {
     const errors = err.errors.map((e) => e.message)
-    return error(res, 400, 'Validation Error', errors)
+    error(res, 400, 'Validation Error', errors)
   }
 
   if (err instanceof UniqueConstraintError) {
     const errors = err.errors.map((e) => e.message)
-    return error(res, 400, 'Duplicate Field Value Entered', errors)
+    error(res, 400, 'Duplicate Field Value Entered', errors)
   }
 
   logger.error(`Unexpected error: ${err}`)
-  return error(res, 500, 'Internal server error')
+  error(res, 500, 'Internal server error')
 }
 
 export default errorHandler

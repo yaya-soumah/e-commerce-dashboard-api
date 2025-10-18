@@ -2,15 +2,21 @@ import { Request, Response, NextFunction } from 'express'
 
 import { error } from '../utils/response.util'
 
-export function authorizeRole(...allowedRoles: string[]) {
+export function authorizeRole(roleName: string) {
   return (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user
 
-    // Allow if 'owner' is specified or user's role is allowed
-    if (allowedRoles.includes('owner') || (user && allowedRoles.includes(user.roleName))) {
+    if (!user || !user.role) {
+      error(res, 401, 'Authentication required')
+    }
+    //see own profile
+    if (roleName === 'owner') {
       return next()
     }
 
-    error(res, 403, 'Access denied: insufficient role')
+    if (user.role !== roleName) {
+      error(res, 403, 'Forbidden: insufficient role')
+    }
+    return next()
   }
 }

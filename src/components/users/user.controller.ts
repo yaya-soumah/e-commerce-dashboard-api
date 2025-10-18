@@ -1,10 +1,19 @@
 import { Request, Response, NextFunction } from 'express'
 
 import { success } from '../../utils/response.util'
+import { AppError } from '../../utils/app-error.util'
 
 import { UserService } from './user.service'
 
 export class UserController {
+  private static authenticateUser(
+    userId: string,
+    currentUser: { userId: string; role: string; permissions: string[] },
+  ): void {
+    if (userId !== currentUser.userId && currentUser.role !== 'admin') {
+      throw new AppError('Forbidden: insufficient role')
+    }
+  }
   static async userList(req: Request, res: Response, next: NextFunction) {
     try {
       const query = req.query
@@ -32,6 +41,11 @@ export class UserController {
   static async getUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
+      const currentUser = (req as any).user
+
+      //check for owner
+      UserController.authenticateUser(id, currentUser)
+
       const user = await UserService.getProfile(Number(id))
       success(res, 200, user, 'Operation successful')
     } catch (err) {
@@ -43,6 +57,12 @@ export class UserController {
     try {
       const { id } = req.params
       const data = req.body
+
+      const currentUser = (req as any).user
+
+      //check for owner
+      UserController.authenticateUser(id, currentUser)
+
       const user = await UserService.updateUser(Number(id), data)
       success(res, 200, user, 'Operation successful')
     } catch (err) {
@@ -56,15 +76,21 @@ export class UserController {
       const { role } = req.body
 
       const user = await UserService.ChangeUserRole(Number(id), role)
-      success(res, 200, user, 'ROle updated successfully')
+      success(res, 200, user, 'Role updated successfully')
     } catch (err) {
       next(err)
     }
   }
+
   static async updatePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
       const { newPassword, oldPassword } = req.body
+
+      const currentUser = (req as any).user
+
+      //check for owner
+      UserController.authenticateUser(id, currentUser)
 
       const user = await UserService.updatePassword(Number(id), newPassword, oldPassword)
       success(res, 200, user, 'Password updated successfully')
@@ -87,6 +113,7 @@ export class UserController {
   static async deleteUser(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params
+
       await UserService.deleteUser(Number(id))
       success(res, 204, null, 'Operation successful')
     } catch (err) {

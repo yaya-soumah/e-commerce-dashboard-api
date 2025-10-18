@@ -49,14 +49,14 @@ describe('Product Component', () => {
     analystToken = anToken
     analystSessionCookie = anSessionCookies
 
-    await adminRole.$set('permissions', await Permission.findAll())
-    await staffRole.$set(
+    await adminRole!.$set('permissions', await Permission.findAll())
+    await staffRole!.$set(
       'permissions',
       await Permission.findAll({
         where: { key: ['product:create', 'product:update', 'product:delete', 'product:view'] },
       }),
     )
-    await analystRole.$set(
+    await analystRole!.$set(
       'permissions',
       await Permission.findAll({ where: { key: ['product:view'] } }),
     )
@@ -93,7 +93,6 @@ describe('Product Component', () => {
           tags: ['test'],
           images: ['https://example.com/test.jpg'],
         })
-      console.log('admin create product**', res.body)
       expect(res.status).toBe(201)
       expect(res.body.status).toBe('success')
       expect(res.body.data.name).toBe('Test Product')
@@ -119,8 +118,6 @@ describe('Product Component', () => {
           images: ['https://example.com/staff.jpg'],
         })
 
-      console.log('staff create product**', res.body)
-
       expect(res.status).toBe(201)
       expect(res.body.status).toBe('success')
       expect(res.body.data.name).toBe('Staff Product')
@@ -144,7 +141,7 @@ describe('Product Component', () => {
 
       expect(res.status).toBe(403)
       expect(res.body.status).toBe('error')
-      expect(res.body.message).toBe('Access denied: insufficient role')
+      expect(res.body.message).toBe('Forbidden: insufficient permission')
     })
 
     it('should failed to create duplicate name', async () => {
@@ -173,7 +170,6 @@ describe('Product Component', () => {
           sku: 'UNIQUE-002',
           categoryId,
         })
-      console.log('failed duplicate create product**', res.body)
       expect(res.status).toBe(400)
       expect(res.body.message).toBe('Name must be unique')
     })

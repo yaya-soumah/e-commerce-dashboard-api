@@ -1,7 +1,7 @@
 import request from 'supertest'
 
 import app from '../../../app'
-import { Role, Permission, Category, Order, OrderItem, Product, Payment } from '../../../models'
+import { Category, Order, OrderItem, Product, Payment } from '../../../models'
 import { generateTokens } from '../../utils/loader'
 import { generateSlug } from '../../../utils/slag'
 
@@ -29,29 +29,29 @@ describe('Analytics Component', () => {
     staffToken = stToken
     staffCookie = stSession
 
-    // Seed permissions
-    const permissions = [
-      { key: 'analytics:view', description: 'View analytics' },
-      { key: 'order:view', description: 'View orders' },
-      { key: 'product:view', description: 'View products' },
-    ]
-    for (const perm of permissions) {
-      await Permission.create(perm)
-    }
+    // // Seed permissions
+    // const permissions = [
+    //   { key: 'analytics:view', description: 'View analytics' },
+    //   { key: 'order:view', description: 'View orders' },
+    //   { key: 'product:view', description: 'View products' },
+    // ]
+    // for (const perm of permissions) {
+    //   await Permission.create(perm)
+    // }
 
-    // Seed roles
-    const adminRole = await Role.findOne({ where: { name: 'admin' } })
-    const analystRole = await Role.findOne({ where: { name: 'analyst' } })
+    // // Seed roles
+    // const adminRole = await Role.findOne({ where: { name: 'admin' } })
+    // const analystRole = await Role.findOne({ where: { name: 'analyst' } })
 
-    await adminRole!.$set('permissions', await Permission.findAll())
-    await analystRole!.$set(
-      'permissions',
-      await Permission.findAll({
-        where: { key: ['analytics:view', 'order:view', 'product:view'] },
-      }),
-    )
-    await adminRole!.save()
-    await analystRole!.save()
+    // await adminRole!.$set('permissions', await Permission.findAll())
+    // await analystRole!.$set(
+    //   'permissions',
+    //   await Permission.findAll({
+    //     where: { key: ['analytics:view', 'order:view', 'product:view'] },
+    //   }),
+    // )
+    // await adminRole!.save()
+    // await analystRole!.save()
 
     //create a new product
     const category = await Category.create({
@@ -86,7 +86,7 @@ describe('Analytics Component', () => {
       status: 'pending',
       paymentStatus: 'paid',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
     await OrderItem.create({
       orderId: order1.id,
@@ -112,7 +112,7 @@ describe('Analytics Component', () => {
       status: 'pending',
       paymentStatus: 'paid',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
     await OrderItem.create({
       orderId: order2.id,
@@ -131,11 +131,14 @@ describe('Analytics Component', () => {
   })
   describe('GET /analytics/overview', () => {
     it('should allow admin to get sales overview', async () => {
+      //keep time interval updated
+      const endDate = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+
       const res = await request(app)
         .get('/api/v1/analytics/sales')
         .set('Authorization', `Bearer ${analystToken}`)
         .set('Cookie', [analystCookie])
-        .query({ startDate: '2025-10-01', endDate: '2025-10-18' }) //update the interval to pass the test
+        .query({ startDate: '2025-10-01', endDate })
 
       expect(res.status).toBe(200)
       expect(res.body.status).toBe('success')
@@ -152,7 +155,7 @@ describe('Analytics Component', () => {
 
       expect(res.status).toBe(403)
       expect(res.body.status).toBe('error')
-      expect(res.body.message).toBe('Access denied: insufficient role')
+      expect(res.body.message).toBe('Forbidden: insufficient permission')
     })
   })
   describe('GET /analytics/top-products', () => {

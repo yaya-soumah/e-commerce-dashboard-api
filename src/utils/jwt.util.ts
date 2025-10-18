@@ -1,5 +1,7 @@
 import jwt from 'jsonwebtoken'
 
+import { PayloadType } from '../types'
+
 import {
   ACCESS_TOKEN_EXPIRES_IN,
   REFRESH_TOKEN_EXPIRES_IN,
@@ -7,12 +9,14 @@ import {
   REFRESH_TOKEN_SECRET,
 } from './env.util'
 
-export function signAccessToken(payload: object) {
-  return jwt.sign(payload, ACCESS_TOKEN_SECRET, { expiresIn: ACCESS_TOKEN_EXPIRES_IN })
+export function signAccessToken({ userId, role, permissions }: PayloadType) {
+  return jwt.sign({ userId, role, permissions }, ACCESS_TOKEN_SECRET, {
+    expiresIn: ACCESS_TOKEN_EXPIRES_IN,
+  })
 }
 
-export function signRefreshToken(payload: object) {
-  return jwt.sign(payload, REFRESH_TOKEN_SECRET, {
+export function signRefreshToken({ userId, role, permissions }: PayloadType) {
+  return jwt.sign({ userId, role, permissions }, REFRESH_TOKEN_SECRET, {
     expiresIn: REFRESH_TOKEN_EXPIRES_IN,
   })
 }

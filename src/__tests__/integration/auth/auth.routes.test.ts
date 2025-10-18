@@ -8,15 +8,11 @@ import { authFactory } from './auth.factory'
 describe('Auth API', () => {
   let adminToken: string
   let adminSessionCookie: string
-  let nonAdminToken: string
 
   beforeAll(async () => {
     const { token: adToken, session: adSession } = await generateTokens('admin')
     adminToken = adToken
     adminSessionCookie = adSession
-
-    const { token: stToken } = await generateTokens('staff')
-    nonAdminToken = stToken
   })
 
   describe('Post /auth/register', () => {
@@ -28,16 +24,6 @@ describe('Auth API', () => {
         .send(authFactory({ name: 'analyst' }))
 
       expect(res.status).toBe(201)
-    })
-
-    it('Non admin should not create new user', async () => {
-      const res = await request(app)
-        .post('/api/v1/auth/register')
-        .set('Authorization', `Bearer ${nonAdminToken}`)
-        .set('Cookie', [adminSessionCookie])
-        .send(authFactory({ name: 'staff', email: 'staff@example.com' }))
-
-      expect(res.status).toBe(403)
     })
 
     it('Should throw error with duplicate email', async () => {

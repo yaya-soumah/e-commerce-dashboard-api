@@ -1,14 +1,14 @@
 import { Router } from 'express'
 
 import { authenticateToken } from '../../middleware/auth.middleware'
-import { authorizeRole } from '../../middleware/requireRole.middleware'
+import { requirePermission } from '../../middleware/requirePermission.middleware'
 
 import { DashboardMetricsController } from './dashboard.controller'
 
 const router = Router()
 
 router.use(authenticateToken)
-router.use(authorizeRole('admin', 'analyst'))
+router.use(requirePermission('dashboard:view'))
 router.get('/', DashboardMetricsController.getMetricsHandler)
 
 export default router

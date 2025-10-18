@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 import { authenticateToken } from '../../middleware/auth.middleware'
-import { authorizeRole } from '../../middleware/requireRole.middleware'
+import { requirePermission } from '../../middleware/requirePermission.middleware'
 import { validate } from '../../middleware/validate.middleware'
 
 import { CreateOrderItemSchema } from './order-item.schema'
@@ -12,26 +12,26 @@ const router = Router()
 
 router.use(authenticateToken)
 
-router.get('/', OrderController.listOrder)
+router.get('/', requirePermission('order:view'), OrderController.listOrder)
 router.post(
   '/',
-  authorizeRole('admin', 'staff'),
+  requirePermission('order:create'),
   validate(OrderSchema),
   OrderController.createOrder,
 )
 router.post(
   '/item/:id',
-  authorizeRole('admin', 'staff'),
+  requirePermission('order:create'),
   validate(CreateOrderItemSchema),
   OrderController.addOrderItem,
 )
-router.get('/:id', OrderController.retrieveOrder)
+router.get('/:id', requirePermission('order:view'), OrderController.retrieveOrder)
 router.patch(
   '/:id',
-  authorizeRole('admin', 'staff'),
+  requirePermission('order:update'),
   validate(UpdateOrderSchema),
   OrderController.updateOrder,
 )
-router.delete('/:id', authorizeRole('admin'), OrderController.deleteOrder)
+router.delete('/:id', requirePermission('order:delete'), OrderController.deleteOrder)
 
 export default router

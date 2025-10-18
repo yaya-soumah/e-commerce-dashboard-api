@@ -2,16 +2,7 @@ import request from 'supertest'
 
 import { generateTokens } from '../../utils/loader'
 import app from '../../../app'
-import {
-  Order,
-  Product,
-  Category,
-  Permission,
-  Role,
-  OrderItem,
-  Payment,
-  Inventory,
-} from '../../../models'
+import { Order, Product, Category, OrderItem, Payment, Inventory } from '../../../models'
 import { generateSlug } from '../../../utils/slag'
 
 describe('Admin Dashboard API', () => {
@@ -37,30 +28,6 @@ describe('Admin Dashboard API', () => {
 
     staffToken = stToken
     staffCookie = stSession
-
-    // Seed permissions
-    const permissions = [
-      { key: 'analytics:view', description: 'View analytics' },
-      { key: 'order:view', description: 'View orders' },
-      { key: 'product:view', description: 'View products' },
-    ]
-    for (const perm of permissions) {
-      await Permission.create(perm)
-    }
-
-    // Seed roles
-    const adminRole = await Role.findOne({ where: { name: 'admin' } })
-    const analystRole = await Role.findOne({ where: { name: 'analyst' } })
-
-    await adminRole!.$set('permissions', await Permission.findAll())
-    await analystRole!.$set(
-      'permissions',
-      await Permission.findAll({
-        where: { key: ['analytics:view', 'order:view', 'product:view'] },
-      }),
-    )
-    await adminRole!.save()
-    await analystRole!.save()
 
     //create a new product
     const category = await Category.create({
@@ -103,7 +70,7 @@ describe('Admin Dashboard API', () => {
       status: 'pending',
       paymentStatus: 'paid',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
     await OrderItem.create({
       orderId: order1.id,
@@ -129,7 +96,7 @@ describe('Admin Dashboard API', () => {
       status: 'pending',
       paymentStatus: 'paid',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
     await OrderItem.create({
       orderId: order2.id,
@@ -155,7 +122,7 @@ describe('Admin Dashboard API', () => {
       status: 'shipped',
       paymentStatus: 'paid',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
     await OrderItem.create({
       orderId: order3.id,
@@ -182,7 +149,7 @@ describe('Admin Dashboard API', () => {
       status: 'cancelled',
       paymentStatus: 'refunded',
       notes: '',
-      userId: admin.id,
+      userId: admin!.id,
     })
   })
 
@@ -191,6 +158,8 @@ describe('Admin Dashboard API', () => {
       .get('/api/v1/metrics')
       .set('Authorization', `Bearer ${adminToken}`)
       .set('Cookie', [adminCookie])
+
+    console.log('res.body****', res.body)
 
     expect(res.status).toBe(200)
   })

@@ -29,7 +29,6 @@ export class AuthController {
   static async loginHandler(req: Request, res: Response) {
     try {
       const { email, password } = req.body
-      console.log('controller-login: ', email, password)
       const { accessToken, refreshToken, user } = await AuthService.login({
         email,
         password,

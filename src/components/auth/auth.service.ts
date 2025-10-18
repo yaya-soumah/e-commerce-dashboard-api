@@ -1,36 +1,45 @@
 import { AppError } from '../../utils/app-error.util'
 import { signRefreshToken, signAccessToken, verifyRefreshToken } from '../../utils/jwt.util'
 import { compare, parse } from '../../utils/bcrypt.util'
-import { UserRole } from '../users/user.model'
+import { User } from '../../models'
 import { RolesRepository } from '../roles/roles.repositories'
+import { PayloadType } from '../../types'
 
 import { AuthRepository } from './auth.repository'
 
 export class AuthService {
-  private static payload(user: any, role: any) {
-    console.log('auth-service-payload:', {
+  private static payload(user: User): PayloadType {
+    const permissions: string[] = user?.role?.permissions?.map((p) => p.key) as string[]
+
+    return {
       userId: user.id,
-      email: user.email,
-      roleName: role.name,
-    })
-    return { userId: user.id, email: user.email, roleName: role.name }
+      role: user.role?.name as string,
+      permissions,
+    }
   }
+
+  //register user
   static async register(data: { name: string; email: string; password: string }) {
     const isEmailExist = await AuthRepository.getByEmail(data.email)
+
     if (isEmailExist) throw new AppError('This email already exists', 400)
 
     const hashedPassword = await parse(data.password)
 
     const role = await RolesRepository.getOrCreate('staff')
-    const user = await AuthRepository.create({
+    const newUser = await AuthRepository.create({
       name: data.name,
       email: data.email,
       password: hashedPassword,
       roleId: role.id,
     })
 
-    const accessToken = signAccessToken(this.payload(user, role.get({ plain: true })))
-    const refreshToken = signRefreshToken(this.payload(user, role.get({ plain: true })))
+    const user = await AuthRepository.getById(newUser.id)
+
+    const claim: PayloadType = AuthService.payload(user as User)
+
+    const accessToken = signAccessToken(claim)
+    const refreshToken = signRefreshToken(claim)
 
     return { accessToken, refreshToken, user }
   }
@@ -42,29 +51,19 @@ export class AuthService {
     const match = await compare(data.password, user.getDataValue('password'))
 
     if (!match) throw new AppError('Wrong password', 400)
-    const role = await user.$get('role')
-    const accessToken = signAccessToken(
-      this.payload(user.get({ plain: true }), role?.get({ plain: true })),
-    )
-    const refreshToken = signRefreshToken(
-      this.payload(user.get({ plain: true }), role?.get({ plain: true })),
-    )
+
+    const claim: PayloadType = AuthService.payload(user as User)
+
+    const accessToken = signAccessToken(claim)
+    const refreshToken = signRefreshToken(claim)
 
     return { accessToken, refreshToken, user }
   }
 
   static async refresh(refreshToken: string) {
     try {
-      const decode = verifyRefreshToken(refreshToken) as {
-        userId: string
-        email: string
-        roleId: UserRole
-      }
-      const accessToken = signAccessToken({
-        userId: decode.userId,
-        email: decode.email,
-        roleId: decode.roleId,
-      })
+      const decode = verifyRefreshToken(refreshToken) as PayloadType
+      const accessToken = signAccessToken(decode)
       return { accessToken }
     } catch {
       throw new AppError('Invalid or expired refresh token', 400)

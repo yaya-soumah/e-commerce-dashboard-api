@@ -3,6 +3,7 @@ import { Router } from 'express'
 import { validate } from '../../middleware/validate.middleware'
 import { authenticateToken } from '../../middleware/auth.middleware'
 import { authorizeRole } from '../../middleware/requireRole.middleware'
+import { requirePermission } from '../../middleware/requirePermission.middleware'
 
 import { PaymentController } from './payment.controller'
 import { PaymentCreateSchema, PaymentUpdateSchema } from './payment.schema'
@@ -11,25 +12,21 @@ const router = Router()
 
 router.use(authenticateToken)
 
-router.get('/', PaymentController.listHandler)
+router.get('/', requirePermission('payment:view'), PaymentController.listHandler)
 
-router.get(
-  '/:id',
-
-  PaymentController.getHandler,
-)
+router.get('/:id', requirePermission('payment:view'), PaymentController.getHandler)
 
 router.post(
   '/:orderId',
   validate(PaymentCreateSchema),
-  authorizeRole('admin', 'staff'),
+  requirePermission('payment:create'),
   PaymentController.createHandler,
 )
 
 router.patch(
   '/:id',
   validate(PaymentUpdateSchema),
-  authorizeRole('admin', 'staff'),
+  requirePermission('payment:update'),
   PaymentController.updateHandler,
 )
 

@@ -1,4 +1,4 @@
-import { User } from '../../models/index'
+import { Permission, Role, User } from '../../models/index'
 import { UserCreationAttributes } from '../users/user.model'
 
 export class AuthRepository {
@@ -11,13 +11,40 @@ export class AuthRepository {
   }
 
   static async getByEmail(email: string) {
-    const user = await User.scope('addPassword').findOne({ where: { email } })
+    const user = await User.scope('addPassword').findOne({
+      where: { email },
+      include: [
+        {
+          model: Role,
+          as: 'role',
+          include: [
+            {
+              model: Permission,
+              as: 'permissions',
+            },
+          ],
+        },
+      ],
+    })
     if (!user) return null
     return user
   }
 
   static async getById(id: number) {
-    const user = await User.findByPk(id)
+    const user = await User.findByPk(id, {
+      include: [
+        {
+          model: Role,
+          as: 'role',
+          include: [
+            {
+              model: Permission,
+              as: 'permissions',
+            },
+          ],
+        },
+      ],
+    })
     if (!user) return null
     return user
   }
