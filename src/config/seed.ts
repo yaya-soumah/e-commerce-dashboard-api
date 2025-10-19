@@ -49,6 +49,7 @@ const defaultPermissions = [
   { key: 'analytic:update', description: 'Update analytics' },
   { key: 'analytic:delete', description: 'Delete analytics' },
   { key: 'dashboard:view', description: 'View admin dashboard' },
+  { key: 'audit:view', description: 'View audit logs' },
 ]
 
 const defaultRoles = [
@@ -87,6 +88,7 @@ const defaultRoles = [
       'analytic:update',
       'analytic:delete',
       'dashboard:view',
+      'audit:view',
     ],
   },
   {
@@ -118,6 +120,7 @@ const defaultRoles = [
       'payment:view',
       'analytic:view',
       'dashboard:view',
+      'audit:view',
     ],
   },
 ]

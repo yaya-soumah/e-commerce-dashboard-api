@@ -91,12 +91,12 @@ export class PaymentRepository {
   static async deletePayment(id: number) {
     const transaction = await sequelize.transaction()
     try {
-      const payment = await Payment.findByPk(id, { transaction })
+      const payment = await Payment.findByPk(id)
       if (!payment) {
         throw new AppError('Payment not found', 404)
       }
 
-      const order = await Order.findByPk(payment.orderId, { transaction })
+      const order = await Order.findByPk(payment.orderId)
       if (order && order.status !== 'cancelled') {
         throw new AppError('Cannot delete payment for active order', 400)
       }

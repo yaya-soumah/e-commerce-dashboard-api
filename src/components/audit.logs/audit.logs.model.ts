@@ -16,7 +16,7 @@ import type { ActionType } from './audit.logs.types'
 
 type AuditCreateType = Optional<AuditType, 'id' | 'createdAt' | 'updatedAt'>
 
-@Table({ tableName: 'ecormmerce_audit_logs', timestamps: true })
+@Table({ tableName: 'ecommerce_audit_logs', timestamps: true })
 export class AuditLogs extends Model<AuditType, AuditCreateType> {
   @ForeignKey(() => User)
   @AllowNull(false)

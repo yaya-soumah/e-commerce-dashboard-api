@@ -12,6 +12,7 @@ import { InventoryHistory } from '../components/inventories/inventoryHistory.mod
 import { Order } from '../components/orders/order.model'
 import { OrderItem } from '../components/orders/orderItem.model'
 import { Payment } from '../components/payments/payment.model'
+import { AuditLog } from '../components/audit.logs'
 
 export const models = [
   User,
@@ -28,6 +29,7 @@ export const models = [
   Order,
   OrderItem,
   Payment,
+  AuditLog,
 ]
 
 export {
@@ -45,4 +47,5 @@ export {
   Order,
   OrderItem,
   Payment,
+  AuditLog,
 }
