@@ -12,6 +12,7 @@ import orderRouter from '../components/orders/order.routes'
 import paymentRouter from '../components/payments/payment.routes'
 import analyticRouter from '../components/analytics/analytic.routes'
 import adminDashboardRouter from '../components/dashboard/dashboard.routes'
+import auditRouter from '../components/audit.logs/audit.logs.routes'
 
 const router = Router()
 
@@ -28,5 +29,6 @@ router.use('/orders', orderRouter)
 router.use('/payments', paymentRouter)
 router.use('/analytics', analyticRouter)
 router.use('/metrics', adminDashboardRouter)
+router.use('/audit-logs', auditRouter)
 
 export default router

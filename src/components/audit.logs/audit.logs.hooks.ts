@@ -1,6 +1,7 @@
 import { auditStorage } from '../../utils/requestContext.util'
-import { AuditLog, Inventory, Order, Payment, Product, Role, User } from '../../models'
+import { Inventory, Order, Payment, Product, Role, User } from '../../models'
 
+import { AuditLogService } from './audit.logs.service'
 // Sensitive fields to exclude
 const SENSITIVE_FIELDS = ['password', 'accessToken', 'refreshToken']
 
@@ -33,7 +34,7 @@ function addAuditHooks(model: any) {
     if (!store) return
 
     const changes = buildChanges(undefined, instance.get())
-    await AuditLog.create({
+    await AuditLogService.logAction({
       userId: store.userId,
       resource,
       action: 'create',
@@ -50,7 +51,7 @@ function addAuditHooks(model: any) {
 
     const changes = buildChanges(oldAttrs, instance.get())
     const action = changes?.statusChange ? 'status-change' : 'update'
-    await AuditLog.create({
+    await AuditLogService.logAction({
       userId: store.userId,
       resource,
       action,
@@ -66,7 +67,7 @@ function addAuditHooks(model: any) {
     if (!store) return
 
     const oldAttrs = instance.get() // Pre-destroy snapshot
-    await AuditLog.create({
+    await AuditLogService.logAction({
       userId: store.userId,
       resource,
       action: 'delete',

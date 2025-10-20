@@ -6,7 +6,7 @@ import { PayloadType } from '../types'
 import { runWithContext } from '../utils/requestContext.util'
 
 export const authenticateToken = async (req: Request, res: Response, next: NextFunction) => {
-  //make it async handle audit
+  //make it async to handle audit
   const authHeader = req.headers.authorization
   const token = authHeader?.split(' ')[1]
 

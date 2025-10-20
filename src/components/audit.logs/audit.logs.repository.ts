@@ -30,9 +30,6 @@ export class AuditLogRepository {
   }
 
   static async create(data: Omit<AuditType, 'id' | 'createdAt' | 'updatedAt'>): Promise<AuditLog> {
-    const newAudit = await AuditLog.create(data)
-    return await AuditLog.findByPk(newAudit.id, {
-      include: [{ model: User, attributes: ['id', 'name', 'roleId'] }],
-    })
+    await AuditLog.create(data)
   }
 }
