@@ -12,7 +12,7 @@ import { InventoryHistory } from '../components/inventories/inventoryHistory.mod
 import { Order } from '../components/orders/order.model'
 import { OrderItem } from '../components/orders/orderItem.model'
 import { Payment } from '../components/payments/payment.model'
-import { AuditLog } from '../components/audit.logs'
+import { AuditLog } from '../components/audit.logs/audit.logs.model'
 
 export const models = [
   User,

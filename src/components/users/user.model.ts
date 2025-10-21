@@ -27,6 +27,7 @@ interface UserAttributes {
   password: string
   roleId: number
   status?: string
+  avatarFilename?: string
   avatar?: string
   createdAt?: Date
   updatedAt?: Date
@@ -34,7 +35,7 @@ interface UserAttributes {
 
 type UserCreationAttributes = Optional<
   UserAttributes,
-  'id' | 'status' | 'avatar' | 'createdAt' | 'updatedAt'
+  'id' | 'status' | 'avatar' | 'avatarFilename' | 'createdAt' | 'updatedAt'
 >
 export type { UserAttributes, UserCreationAttributes }
 
@@ -70,6 +71,9 @@ export class User extends Model<UserAttributes, UserCreationAttributes> {
 
   @Column(DataType.STRING)
   declare avatar?: string
+
+  @Column(DataType.STRING)
+  declare avatarFilename?: string
 
   @BelongsTo(() => Role)
   role?: Role
