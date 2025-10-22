@@ -2,7 +2,7 @@ import path from 'path'
 
 import multer from 'multer'
 import { Express, Request } from 'express'
-import { v4 as UUIDv4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import fs from 'fs-extra'
 
 import { AppError } from '../utils/app-error.util'
@@ -28,7 +28,8 @@ const storage = multer.diskStorage({
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname)
-    const base = UUIDv4()
+
+    const base = uuidv4()
     cb(null, `${base}${ext}`)
   },
 })

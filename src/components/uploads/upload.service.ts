@@ -47,12 +47,25 @@ export class UploadService {
       await t.commit()
 
       // delete old after commit
-      if (oldFilename) await fileService.delete(oldFilename).catch(logger.warn)
+
+      if (oldFilename) {
+        try {
+          await fileService.delete(oldFilename)
+        } catch (err) {
+          logger.warn((err as Error).message)
+        }
+      }
 
       return { avatarUrl: meta.url }
     } catch (err) {
       await t.rollback()
-      if (file.filename) await fileService.delete(file.filename).catch(logger.warn)
+      if (file.filename) {
+        try {
+          await fileService.delete(file.filename)
+        } catch (err) {
+          logger.warn((err as Error).message)
+        }
+      }
       throw err
     }
   }

@@ -28,7 +28,7 @@ export class UploadRepository {
     return ProductImage.findAll({ where: { productId } })
   }
 
-  static async findUserByIdForUpdate(userId: number, t?: Transaction): Promise<User> {
+  static async findUserByIdForUpdate(userId: number, t?: Transaction): Promise<User | null> {
     return User.findByPk(userId, { transaction: t, lock: t?.LOCK.UPDATE })
   }
 

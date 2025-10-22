@@ -14,7 +14,8 @@ jest.mock('../../../components/uploads/storage-service', () => ({
 
 jest.mock('../../../components/uploads/upload.repository')
 jest.mock('../../../config/database.config', () => ({
-  sequelize: {
+  __esModule: true,
+  default: {
     transaction: jest.fn(),
   },
 }))
@@ -69,7 +70,7 @@ describe('UploadService', () => {
     it('should throw if product not found', async () => {
       Product.findByPk = jest.fn().mockResolvedValue(null)
 
-      await expect(UploadService.uploadProductImages(999, [])).rejects.toThrow('PRODUCT_NOT_FOUND')
+      await expect(UploadService.uploadProductImages(999, [])).rejects.toThrow('product not found')
     })
 
     it('should throw if exceeds max limit', async () => {
@@ -78,13 +79,13 @@ describe('UploadService', () => {
 
       await expect(
         UploadService.uploadProductImages(1, [{ filename: 'x.jpg' } as any]),
-      ).rejects.toThrow('MAX_IMAGE_LIMIT')
+      ).rejects.toThrow('max image limit exceeded')
     })
   })
 
   describe('uploadUserAvatar', () => {
     beforeEach(() => {
-      ;(sequelize.transaction as jest.Mock).mockImplementation((cb) => cb(mockTransaction))
+      ;(sequelize.transaction as jest.Mock).mockResolvedValue(mockTransaction)
     })
 
     it('should upload user avatar successfully', async () => {
@@ -128,7 +129,7 @@ describe('UploadService', () => {
     it('should throw FILE_NOT_FOUND if image not exists', async () => {
       ;(UploadRepository.findProductImageById as jest.Mock).mockResolvedValue(null)
 
-      await expect(UploadService.deleteProductImage(1)).rejects.toThrow('FILE_NOT_FOUND')
+      await expect(UploadService.deleteProductImage(1)).rejects.toThrow('file not found')
     })
   })
 })

@@ -2,8 +2,13 @@ import path from 'path'
 import { createReadStream } from 'fs'
 
 import { Express } from 'express'
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
-import { v4 as UUIDv4 } from 'uuid'
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  DeleteObjectCommandOutput,
+} from '@aws-sdk/client-s3'
+import { v4 as uuidv4 } from 'uuid'
 
 import {
   AWS_S3_BUCKET,
@@ -25,7 +30,7 @@ const bucketName = AWS_S3_BUCKET
 export const s3FileService = {
   async save(file: Express.Multer.File) {
     const ext = path.extname(file.originalname)
-    const filename = `${UUIDv4()}${ext}`
+    const filename = `${uuidv4()}${ext}`
     const key = `uploads/${filename}`
 
     await s3.send(
@@ -49,9 +54,9 @@ export const s3FileService = {
     }
   },
 
-  async delete(filename: string) {
+  async delete(filename: string): Promise<DeleteObjectCommandOutput> {
     const key = `uploads/${filename}`
-    await s3.send(
+    return s3.send(
       new DeleteObjectCommand({
         Bucket: bucketName,
         Key: key,

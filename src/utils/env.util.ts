@@ -4,8 +4,9 @@ import { config } from 'dotenv'
 import { AppError } from './app-error.util'
 config()
 
-function getEnvironmentVariable(name: string): string {
-  let value = process.env[name]
+function getEnvironmentVariable(name: string): StringValue {
+  let value = process.env[name] as StringValue
+
   if (!value) throw new AppError(`Missing env variable: ${name}`)
   return value
 }
@@ -16,7 +17,6 @@ export const REFRESH_TOKEN_SECRET = getEnvironmentVariable('REFRESH_TOKEN_SECRET
 export const ACCESS_TOKEN_EXPIRES_IN = getEnvironmentVariable('ACCESS_TOKEN_EXPIRES_IN')
 export const REFRESH_TOKEN_EXPIRES_IN = getEnvironmentVariable('REFRESH_TOKEN_EXPIRES_IN')
 export const UPLOAD_DIR = getEnvironmentVariable('UPLOAD_DIR')
-export const APP_URL = getEnvironmentVariable('APP_URL')
 export const AWS_ACCESS_KEY_ID = getEnvironmentVariable('AWS_ACCESS_KEY_ID')
 export const AWS_SECRET_ACCESS_KEY = getEnvironmentVariable('AWS_SECRET_ACCESS_KEY')
 export const AWS_S3_BUCKET = getEnvironmentVariable('AWS_S3_BUCKET')
