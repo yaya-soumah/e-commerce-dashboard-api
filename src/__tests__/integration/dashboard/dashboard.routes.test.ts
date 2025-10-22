@@ -159,8 +159,6 @@ describe('Admin Dashboard API', () => {
       .set('Authorization', `Bearer ${adminToken}`)
       .set('Cookie', [adminCookie])
 
-    console.log('res.body****', res.body)
-
     expect(res.status).toBe(200)
   })
 
@@ -178,7 +176,6 @@ describe('Admin Dashboard API', () => {
       .set('Authorization', `Bearer ${staffToken}`)
       .set('Cookie', [staffCookie])
 
-    console.log('res.body', res.body)
     expect(res.status).toBe(403)
   })
 })

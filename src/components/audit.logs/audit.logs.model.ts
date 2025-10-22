@@ -17,7 +17,7 @@ import type { ActionType } from './audit.logs.types'
 type AuditCreateType = Optional<AuditType, 'id' | 'createdAt' | 'updatedAt'>
 
 @Table({ tableName: 'ecommerce_audit_logs', timestamps: true })
-export class AuditLogs extends Model<AuditType, AuditCreateType> {
+export class AuditLog extends Model<AuditType, AuditCreateType> {
   @ForeignKey(() => User)
   @AllowNull(false)
   @Column(DataType.INTEGER)
@@ -48,6 +48,6 @@ export class AuditLogs extends Model<AuditType, AuditCreateType> {
   @Column(DataType.STRING)
   declare ipAddress: string
 
-  @BelongsTo(() => User, 'user')
+  @BelongsTo(() => User)
   user?: User
 }

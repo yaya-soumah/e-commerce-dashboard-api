@@ -32,7 +32,7 @@ describe('Roles API', () => {
       expect(res.body.data.name).toBe('testRole')
     })
     it('Should throw error for non admin role', async () => {
-      const nonAdminPayload = { userId: 3, email: 'non-admin@example.com', role: 'staff' }
+      const nonAdminPayload = { userId: 3, role: 'staff', permissions: [] }
       const nonAdminToken = signAccessToken(nonAdminPayload)
       const nonAdminRefreshToken = signRefreshToken(nonAdminPayload)
       const nonAdminSessionCookie = `refreshToken=${nonAdminRefreshToken}; HttpOnly; Secure=false; SameSite=strict`
@@ -133,7 +133,6 @@ describe('Roles API', () => {
         .delete(`/api/v1/roles/${role.id}`)
         .set('Authorization', `Bearer ${adminToken}`)
         .set('Cookie', [sessionCookie])
-      console.log('Response delete role:', res.body)
       expect(res.status).toBe(204)
     })
     it('Should throw error for missing token', async () => {

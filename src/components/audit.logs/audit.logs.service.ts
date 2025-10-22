@@ -40,7 +40,7 @@ export class AuditLogService {
     })
     return {
       logs: rows.map((log) => ({
-        ...log.toJSON(),
+        ...log,
         user: log.user || { id: null, name: 'Deleted User', roleId: null },
       })),
       page,
@@ -54,7 +54,7 @@ export class AuditLogService {
     const log = await AuditLogRepository.findById(id)
     if (!log) throw new AppError('Log not found', 404)
     return {
-      ...log.toJSON(),
+      ...log,
       user: log.user || { id: null, name: 'Deleted User', roleId: null },
     }
   }

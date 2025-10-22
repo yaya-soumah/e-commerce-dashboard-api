@@ -2,42 +2,45 @@ import { Transaction } from 'sequelize'
 
 import { ProductImage, User } from '../../models'
 
-import { UploadProductImageType } from './upload.types'
-
 export class UploadRepository {
   static async createProductImage(
-    data: UploadProductImageType,
-    transaction?: Transaction,
+    data: Partial<ProductImage> & { url: string },
   ): Promise<ProductImage> {
-    return ProductImage.create(data, { transaction })
+    return ProductImage.create(data as any)
   }
 
-  static async countProductImages(productId: number): Promise<number> {
-    return ProductImage.count({ where: { productId } }) // Assume paranoid
+  static async findProductImageById(id: number) {
+    return ProductImage.findByPk(id)
+  }
+
+  static async deleteProductImage(id: number) {
+    const image = await ProductImage.findByPk(id)
+    if (!image) return null
+    await image.destroy()
+    return image
+  }
+
+  static async countProductImageForProduct(productId: number) {
+    return ProductImage.count({ where: { productId } })
+  }
+
+  static async listProductImageForProduct(productId: number) {
+    return ProductImage.findAll({ where: { productId } })
+  }
+
+  static async findUserByIdForUpdate(userId: number, t?: Transaction): Promise<User> {
+    return User.findByPk(userId, { transaction: t, lock: t?.LOCK.UPDATE })
   }
 
   static async updateUserAvatar(
-    userId: number,
-    avatar: string,
+    user: User,
+    avatarUrl: string,
     avatarFilename: string,
-    transaction?: Transaction,
-  ): Promise<User | null> {
-    const user = await User.findByPk(userId)
-    if (!user) return null
-    user.update({ avatar, avatarFilename }, { transaction, returning: true })
-    user.save()
+    t?: Transaction,
+  ) {
+    user.avatar = avatarUrl
+    user.avatarFilename = avatarFilename
+    await user.save({ transaction: t })
     return user
-  }
-
-  static async getUserAvatarFilename(userId: number): Promise<string | null> {
-    const user = await User.findByPk(userId, { attributes: ['avatarFilename'] })
-    return user?.avatarFilename || null
-  }
-
-  static async deleteProductImage(imageId: number, transaction?: Transaction): Promise<boolean> {
-    const image = await ProductImage.findByPk(imageId)
-    if (!image) return false
-    await image.destroy({ transaction })
-    return true
   }
 }

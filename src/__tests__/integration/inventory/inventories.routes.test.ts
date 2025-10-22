@@ -100,7 +100,6 @@ describe('Inventory API', () => {
         .set('Authorization', `Bearer ${adminToken}`)
         .set('Cookie', [adminSessionCookie])
 
-      console.log('res.body', res.body)
       expect(res.body.data).not.toBeNull()
       expect(res.body.data).not.toBeUndefined()
       expect(Array.isArray(res.body.data)).toBe(true)

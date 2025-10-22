@@ -1,5 +1,3 @@
-import path from 'path'
-
 import express from 'express'
 import cookieParser from 'cookie-parser'
 import cors from 'cors'
@@ -10,6 +8,8 @@ import { notFoundHandler } from './middleware/errorNotFound.middleware'
 import errorHandler from './middleware/error.middleware'
 import morganMiddleware from './middleware/morgan.middleware'
 import routes from './routes/index'
+import uploadsRouter from './components/uploads/upload.routes'
+import { uploadDir } from './middleware/uploads.middleware'
 
 const app = express()
 
@@ -39,9 +39,13 @@ app.use(compression())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 app.use(morganMiddleware())
+
+if (process.env.NODE_ENV !== 'production') {
+  app.use('/uploads', express.static(uploadDir))
+}
+app.use('/uploads', uploadsRouter)
 
 app.use('/api/v1', routes)
 
