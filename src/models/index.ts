@@ -13,6 +13,8 @@ import { Order } from '../components/orders/order.model'
 import { OrderItem } from '../components/orders/orderItem.model'
 import { Payment } from '../components/payments/payment.model'
 import { AuditLog } from '../components/audit.logs/audit.logs.model'
+import { NotificationLog } from '../components/notifications/notification.log.model'
+import { NotificationSetting } from '../components/notifications/notification.setting.model'
 
 export const models = [
   User,
@@ -30,6 +32,8 @@ export const models = [
   OrderItem,
   Payment,
   AuditLog,
+  NotificationLog,
+  NotificationSetting,
 ]
 
 export {
@@ -48,4 +52,6 @@ export {
   OrderItem,
   Payment,
   AuditLog,
+  NotificationLog,
+  NotificationSetting,
 }
