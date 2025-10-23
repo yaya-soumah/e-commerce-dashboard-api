@@ -50,6 +50,8 @@ const defaultPermissions = [
   { key: 'analytic:delete', description: 'Delete analytics' },
   { key: 'dashboard:view', description: 'View admin dashboard' },
   { key: 'audit:view', description: 'View audit logs' },
+  { key: 'notification:view', description: 'view notification' },
+  { key: 'notification:update', description: 'update notification' },
 ]
 
 const defaultRoles = [
@@ -89,6 +91,8 @@ const defaultRoles = [
       'analytic:delete',
       'dashboard:view',
       'audit:view',
+      'notification:view',
+      'notification:update',
     ],
   },
   {
@@ -107,6 +111,8 @@ const defaultRoles = [
       'order:view',
       'payment:update',
       'payment:view',
+      'notification:view',
+      'notification:update',
     ],
   },
   {
@@ -121,6 +127,7 @@ const defaultRoles = [
       'analytic:view',
       'dashboard:view',
       'audit:view',
+      'notification:view',
     ],
   },
 ]
