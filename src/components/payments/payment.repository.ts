@@ -3,6 +3,7 @@ import { Op } from 'sequelize'
 import { Payment, Order } from '../../models'
 import { AppError } from '../../utils/app-error.util'
 import sequelize from '../../config/database.config'
+import { NotificationService } from '../notifications/notification.service'
 
 import { PaymentFilter, PaymentCreate } from './payment.types'
 
@@ -55,6 +56,13 @@ export class PaymentRepository {
         include: [{ model: Order, as: 'order' }],
       })
     } catch (err) {
+      await order.update({ paymentStatus: 'failed' }, { transaction })
+      await NotificationService.triggerNotification(
+        'failedPayment',
+        'Payment Failed',
+        `Order ${order.id}`,
+        order.id,
+      )
       await transaction.rollback()
       throw err
     }
