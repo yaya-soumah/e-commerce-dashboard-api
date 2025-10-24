@@ -44,7 +44,7 @@ export class PaymentService {
     if (!order) {
       throw new AppError('Order not found', 400)
     }
-    if (order.paymentStatus !== 'unpaid') {
+    if (!['unpaid', 'failed'].includes(order.paymentStatus)) {
       throw new AppError('Order already has a payment', 400)
     }
     if (order.status === 'cancelled') {

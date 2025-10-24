@@ -1,5 +1,5 @@
 import { config } from 'dotenv'
-// import type { StringValue } from 'ms'
+import type { StringValue } from 'ms'
 
 import { AppError } from './app-error.util'
 config()
@@ -22,3 +22,4 @@ export const AWS_SECRET_ACCESS_KEY = getEnvironmentVariable('AWS_SECRET_ACCESS_K
 export const AWS_S3_BUCKET = getEnvironmentVariable('AWS_S3_BUCKET')
 export const AWS_REGION = getEnvironmentVariable('AWS_REGION')
 export const MAX_IMAGES_PER_PRODUCT = getEnvironmentVariable('MAX_IMAGES_PER_PRODUCT')
+export const NOTIFICATION_DEFAULTS = getEnvironmentVariable('NOTIFICATION_DEFAULTS')

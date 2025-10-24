@@ -259,6 +259,20 @@ export const seedDatabase = async () => {
       },
     })
 
+    //seed default analyst user
+    const [analystRole] = await Role.findOrCreate({
+      where: { name: 'analyst' },
+    })
+    await User.findOrCreate({
+      where: { name: 'analyst' },
+      defaults: {
+        name: 'analyst',
+        email: 'analyst1@example.com',
+        password: await parse('Password123'),
+        roleId: analystRole.id,
+      },
+    })
+
     //seed categories
     const categoriesList: Category[] = []
     for (const cat of defaultCategories) {
