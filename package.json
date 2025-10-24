@@ -27,7 +27,9 @@
     "test:unit": "jest __tests__/unit --passWithNoTests",
     "test:integration": "jest __tests__/integration --passWithNoTests",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "worker": "ts-node-dev --respawn src/workers/index.ts",
+    "queue:dev": "npm run dev & npm run worker"
   },
   "repository": {
     "type": "git",
@@ -41,6 +43,7 @@
     "@aws-sdk/client-s3": "^3.914.0",
     "@types/nodemailer": "^7.0.2",
     "bcrypt": "^6.0.0",
+    "bullmq": "^5.61.2",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
@@ -50,6 +53,7 @@
     "fs-extra": "^11.3.2",
     "helmet": "^8.1.0",
     "http-status-codes": "^2.3.0",
+    "ioredis": "^5.8.2",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
@@ -73,6 +77,7 @@
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
     "@types/fs-extra": "^11.0.4",
+    "@types/ioredis": "^4.28.10",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.10",
