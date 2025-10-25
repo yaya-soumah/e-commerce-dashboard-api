@@ -54,6 +54,8 @@ const defaultPermissions = [
   { key: 'notification:update', description: 'update notification' },
   { key: 'job:view', description: 'view job' },
   { key: 'job:trigger', description: 'Trigger job' },
+  { key: 'settings:view', description: 'View settings' },
+  { key: 'settings:update', description: 'Update settings' },
 ]
 
 const defaultRoles = [
@@ -97,6 +99,8 @@ const defaultRoles = [
       'notification:update',
       'job:view',
       'job:trigger',
+      'settings:view',
+      'settings:upload',
     ],
   },
   {
@@ -118,6 +122,7 @@ const defaultRoles = [
       'notification:view',
       'notification:update',
       'job:trigger',
+      'settings:view',
     ],
   },
   {
