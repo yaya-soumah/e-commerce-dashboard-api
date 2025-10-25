@@ -14,6 +14,7 @@ import analyticRouter from '../components/analytics/analytic.routes'
 import adminDashboardRouter from '../components/dashboard/dashboard.routes'
 import auditRouter from '../components/audit.logs/audit.logs.routes'
 import notificationRouter from '../components/notifications/notification.routes'
+import jobRouter from '../components/jobs/job.routes'
 
 const router = Router()
 
@@ -32,5 +33,6 @@ router.use('/analytics', analyticRouter)
 router.use('/metrics', adminDashboardRouter)
 router.use('/audit-logs', auditRouter)
 router.use('/notifications', notificationRouter)
+router.use('/jobs', jobRouter)
 
 export default router

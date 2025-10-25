@@ -15,6 +15,7 @@ import { Payment } from '../components/payments/payment.model'
 import { AuditLog } from '../components/audit.logs/audit.logs.model'
 import { NotificationLog } from '../components/notifications/notification.log.model'
 import { NotificationSetting } from '../components/notifications/notification.setting.model'
+import { JobLog } from '../components/jobs/job.model'
 
 export const models = [
   User,
@@ -34,6 +35,7 @@ export const models = [
   AuditLog,
   NotificationLog,
   NotificationSetting,
+  JobLog,
 ]
 
 export {
@@ -54,4 +56,5 @@ export {
   AuditLog,
   NotificationLog,
   NotificationSetting,
+  JobLog,
 }

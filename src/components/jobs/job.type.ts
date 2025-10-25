@@ -1,6 +1,13 @@
 import { Optional } from 'sequelize'
 
 export const JobStatusValues = ['waiting', 'active', 'completed', 'failed', 'delayed'] as const
+export const ALLOWED_JOBS_VALUES = [
+  'lowStockAlert',
+  'dailySalesReport',
+  'inventorySnapshot',
+  'orderCleanup',
+  'exportCSV',
+]
 
 export type JobStatusType = (typeof JobStatusValues)[number]
 
@@ -19,3 +26,10 @@ export interface JobType {
 }
 
 export type JobCreateType = Optional<JobType, 'id' | 'createdAt' | 'updatedAt'>
+
+export interface JobFilters {
+  jobName?: string
+  status?: string
+  offset?: number
+  limit?: number
+}

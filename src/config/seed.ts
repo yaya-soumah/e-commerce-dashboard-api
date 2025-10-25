@@ -52,6 +52,8 @@ const defaultPermissions = [
   { key: 'audit:view', description: 'View audit logs' },
   { key: 'notification:view', description: 'view notification' },
   { key: 'notification:update', description: 'update notification' },
+  { key: 'job:view', description: 'view job' },
+  { key: 'job:trigger', description: 'Trigger job' },
 ]
 
 const defaultRoles = [
@@ -93,6 +95,8 @@ const defaultRoles = [
       'audit:view',
       'notification:view',
       'notification:update',
+      'job:view',
+      'job:trigger',
     ],
   },
   {
@@ -113,6 +117,7 @@ const defaultRoles = [
       'payment:view',
       'notification:view',
       'notification:update',
+      'job:trigger',
     ],
   },
   {

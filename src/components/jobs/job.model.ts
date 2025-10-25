@@ -5,10 +5,10 @@ import { JobStatusValues } from './job.type'
 
 @Table({ tableName: 'ecormmerce_jobLogs', timestamps: true })
 export class JobLog extends Model<JobType, JobCreateType> {
-  @Column({ type: DataType.STRING(100), allowNull: true, unique: 'unique_jobName_status' })
+  @Column({ type: DataType.STRING(100), allowNull: false, unique: 'unique_jobName_status' })
   declare jobName: string
 
-  @Column({ type: DataType.STRING(50), allowNull: true })
+  @Column({ type: DataType.STRING(50), allowNull: false })
   declare queueName: string
 
   @Column({ type: DataType.JSONB })
