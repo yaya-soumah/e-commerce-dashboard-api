@@ -1,10 +1,13 @@
-import { JobService } from '../../components/jobs/job.service'
-import { JobRepository } from '../../components/jobs/job.repository'
-import { notificationsQueue, reportingQueue } from '../../components/jobs/job.queue.notifications'
-import { AppError } from '../../utils/app-error.util'
+import { JobService } from '../../../components/jobs/job.service'
+import { JobRepository } from '../../../components/jobs/job.repository'
+import {
+  notificationsQueue,
+  reportingQueue,
+} from '../../../components/jobs/job.queue.notifications'
+import { AppError } from '../../../utils/app-error.util'
 
-jest.mock('../../components/jobs/job.repository')
-jest.mock('../../components/jobs/job.queue.notifications', () => ({
+jest.mock('../../../components/jobs/job.repository')
+jest.mock('../../../components/jobs/job.queue.notifications', () => ({
   notificationsQueue: { name: 'notifications', add: jest.fn(), getJobSchedulers: jest.fn() },
   reportingQueue: { name: 'reporting', add: jest.fn(), getJobSchedulers: jest.fn() },
   maintenanceQueue: { name: 'maintenance', add: jest.fn(), getJobSchedulers: jest.fn() },
